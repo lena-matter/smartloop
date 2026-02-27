@@ -1,0 +1,3129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartLoop – School Sustainability App</title>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --aqua-deep: #0B8A8A;
+  --aqua: #17B5B5;
+  --aqua-mid: #2DD4BF;
+  --turq: #40E0D0;
+  --turq-light: #7FEFDF;
+  --turq-pale: #B2F5EA;
+  --turq-wash: #E0FAF5;
+  --mint: #F0FFF9;
+  --cream: #FFFDF7;
+  --paper: #FFF8EE;
+  --craft: #F5E6D0;
+  --craft-dark: #E8D5B8;
+  --coral: #FF7F7F;
+  --coral-pale: #FFE0E0;
+  --sunny: #FFD93D;
+  --sunny-pale: #FFF4C8;
+  --leaf: #4CAF50;
+  --leaf-pale: #D5F0D5;
+  --sky: #64B5F6;
+  --sky-pale: #DCEEFB;
+  --plum: #B388FF;
+  --plum-pale: #EDE0FF;
+  --earth: #8D6E63;
+  --earth-pale: #EFEBE9;
+  --text: #2D3436;
+  --text-light: #636E72;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg: 0 6px 20px rgba(0,0,0,0.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Nunito',sans-serif; background:var(--cream);
+  color:var(--text); -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(64,224,208,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(45,212,191,0.06) 0%, transparent 50%);
+}
+
+/* ── Scrapbook textures ── */
+.tape {
+  position:absolute; width:60px; height:20px; opacity:0.55;
+  background:var(--turq-pale); border:1px solid rgba(0,0,0,0.04);
+  transform:rotate(-3deg); border-radius:2px; z-index:2;
+}
+.tape-r { transform:rotate(3deg); }
+.tape-v { width:20px; height:50px; transform:rotate(2deg); }
+
+.sticker {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:6px 14px; border-radius:20px; font-weight:700;
+  font-size:12px; transform:rotate(-2deg);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.1);
+  border:2px dashed rgba(255,255,255,0.5);
+}
+
+.torn-edge {
+  position:relative;
+}
+.torn-edge::after {
+  content:''; position:absolute; bottom:-6px; left:0; right:0; height:8px;
+  background: linear-gradient(135deg, var(--paper) 33.33%, transparent 33.33%) -8px 0,
+              linear-gradient(225deg, var(--paper) 33.33%, transparent 33.33%) -8px 0;
+  background-size: 16px 8px;
+}
+
+.dashed-border {
+  border:3px dashed var(--turq-pale);
+  border-radius:16px;
+}
+
+.craft-bg {
+  background:var(--craft);
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e8d5b8' fill-opacity='0.4'%3E%3Cpath d='M0 0h1v1H0zM10 10h1v1h-1zM20 0h1v1h-1zM30 10h1v1h-1zM0 20h1v1H0zM10 30h1v1h-1zM20 20h1v1h-1zM30 30h1v1h-1z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position:fixed; left:0; top:0; bottom:0; width:220px;
+  background:var(--paper); border-right:3px dashed var(--turq-pale);
+  display:flex; flex-direction:column; z-index:100;
+  box-shadow: var(--shadow);
+  background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%2340E0D0' opacity='0.08'/%3E%3C/svg%3E");
+}
+.sidebar-logo {
+  padding:20px 16px; text-align:center;
+  border-bottom:3px dashed var(--turq-pale);
+  position:relative;
+}
+.sidebar-logo .tape { top:-2px; left:50%; transform:translateX(-50%) rotate(-2deg); }
+.logo-circle {
+  width:56px; height:56px; border-radius:50%; margin:0 auto 8px;
+  background: linear-gradient(135deg, var(--aqua), var(--turq));
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; color:white; font-weight:900;
+  box-shadow: 0 3px 10px rgba(23,181,181,0.3);
+  border:3px solid white;
+}
+.logo-name {
+  font-family:'Caveat',cursive; font-size:26px; font-weight:700;
+  color:var(--aqua-deep); letter-spacing:-0.5px;
+}
+.logo-tag {
+  font-size:9px; font-weight:700; text-transform:uppercase;
+  letter-spacing:1.5px; color:var(--turq);
+  background:var(--turq-wash); padding:2px 8px; border-radius:8px;
+  display:inline-block; margin-top:2px;
+}
+
+.sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; }
+.nav-group { margin-bottom:16px; }
+.nav-group-label {
+  font-family:'Caveat',cursive; font-size:15px; font-weight:700;
+  color:var(--aqua); padding:0 8px; margin-bottom:4px;
+}
+.nav-btn {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:12px;
+  cursor:pointer; transition:all .15s;
+  font-size:13px; font-weight:600; color:var(--text-light);
+  border:none; background:none; width:100%; text-align:left;
+  font-family:'Nunito',sans-serif; margin-bottom:2px;
+}
+.nav-btn:hover { background:var(--turq-wash); color:var(--aqua-deep); }
+.nav-btn.active {
+  background:linear-gradient(135deg, var(--turq-wash), var(--turq-pale));
+  color:var(--aqua-deep);
+  border:2px dashed var(--turq);
+  transform:rotate(-0.5deg);
+}
+.nav-btn .nav-emoji { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
+.nav-badge {
+  margin-left:auto; font-size:10px; font-weight:800;
+  background:var(--coral); color:white;
+  padding:1px 7px; border-radius:10px;
+  transform:rotate(3deg);
+}
+
+.sidebar-footer {
+  padding:12px 16px; border-top:3px dashed var(--turq-pale);
+  display:flex; align-items:center; gap:10px;
+}
+.user-avatar {
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg, var(--sunny), var(--coral));
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; border:2px solid white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.user-name { font-size:12px; font-weight:700; }
+.user-level { font-size:10px; color:var(--aqua); font-weight:600; }
+
+/* ── Main ── */
+.main { margin-left:220px; min-height:100vh; }
+
+.topbar {
+  position:sticky; top:0; z-index:50;
+  background:rgba(255,248,238,0.9); backdrop-filter:blur(10px);
+  border-bottom:3px dashed var(--turq-pale);
+  padding:14px 28px; display:flex; align-items:center;
+  justify-content:space-between;
+}
+.topbar-title { font-family:'Caveat',cursive; font-size:24px; font-weight:700; color:var(--aqua-deep); }
+.topbar-sub { font-size:11px; color:var(--text-light); font-weight:600; }
+.topbar-right { display:flex; gap:8px; align-items:center; }
+.topbar-stat {
+  display:flex; align-items:center; gap:4px;
+  padding:6px 12px; border-radius:20px;
+  font-size:12px; font-weight:700;
+  border:2px dashed;
+}
+.riplet-stat { background:var(--sunny-pale); border-color:var(--sunny); color:#B8860B; }
+.xp-stat { background:var(--turq-wash); border-color:var(--turq); color:var(--aqua-deep); }
+.streak-stat { background:var(--coral-pale); border-color:var(--coral); color:#CC4444; }
+
+.content { padding:24px 28px; }
+
+/* ── Cards ── */
+.card {
+  background:var(--paper); border:2px dashed var(--turq-pale);
+  border-radius:16px; position:relative;
+  box-shadow: var(--shadow);
+  transition: transform .15s, box-shadow .15s;
+}
+.card:hover { transform:rotate(-0.3deg) translateY(-2px); box-shadow:var(--shadow-lg); }
+.card-head {
+  padding:16px 18px 0; display:flex; align-items:flex-start;
+  justify-content:space-between;
+}
+.card-t { font-family:'Caveat',cursive; font-size:20px; font-weight:700; color:var(--aqua-deep); }
+.card-st { font-size:11px; color:var(--text-light); font-weight:600; margin-top:1px; }
+.card-bd { padding:14px 18px 18px; }
+
+/* ── Grids ── */
+.g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+.g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
+.g-main { display:grid; grid-template-columns:2fr 1fr; gap:14px; margin-bottom:20px; }
+
+/* ── Impact Cards ── */
+.impact-card {
+  padding:18px; text-align:center; position:relative; overflow:hidden;
+}
+.impact-card .impact-emoji { font-size:32px; margin-bottom:6px; display:block; }
+.impact-card .impact-val {
+  font-family:'Caveat',cursive; font-size:32px; font-weight:700; line-height:1;
+}
+.impact-card .impact-label { font-size:11px; font-weight:700; color:var(--text-light); margin-top:4px; }
+.impact-card .impact-fun { font-size:10px; color:var(--aqua); font-weight:600; margin-top:4px; font-style:italic; }
+
+/* ── Bin Status ── */
+.bin-card {
+  padding:14px; display:flex; align-items:center; gap:12px;
+}
+.bin-visual {
+  width:48px; height:64px; border-radius:6px 6px 10px 10px;
+  position:relative; overflow:hidden;
+  border:2px solid rgba(0,0,0,0.1);
+}
+.bin-fill {
+  position:absolute; bottom:0; left:0; right:0;
+  transition:height .5s; border-radius:0 0 8px 8px;
+}
+.bin-label { font-size:10px; font-weight:800; text-transform:uppercase;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  color:white; text-shadow:0 1px 2px rgba(0,0,0,0.3); letter-spacing:0.5px;
+}
+.bin-info { flex:1; }
+.bin-name { font-size:13px; font-weight:700; }
+.bin-loc { font-size:10px; color:var(--text-light); }
+.bin-pct { font-family:'Caveat',cursive; font-size:24px; font-weight:700; }
+
+/* ── Badges ── */
+.badge-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:12px; }
+.badge-item {
+  padding:14px 10px; text-align:center; border-radius:16px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+  transition:all .15s; cursor:pointer;
+}
+.badge-item:hover { transform:scale(1.03) rotate(-1deg); border-color:var(--turq); }
+.badge-item.earned { border-color:var(--sunny); background:var(--sunny-pale); }
+.badge-item.earned .badge-icon { filter:none; }
+.badge-item .badge-icon { font-size:36px; display:block; margin-bottom:6px; filter:grayscale(0.6); }
+.badge-item .badge-name { font-size:11px; font-weight:700; }
+.badge-item .badge-pts { font-size:10px; color:var(--aqua); font-weight:600; }
+
+/* ── Activity Feed ── */
+.activity-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 0; border-bottom:2px dotted var(--turq-pale);
+}
+.activity-item:last-child { border-bottom:none; }
+.activity-emoji { font-size:24px; width:36px; height:36px; display:flex;
+  align-items:center; justify-content:center;
+  background:var(--turq-wash); border-radius:12px; flex-shrink:0;
+}
+.activity-text { font-size:12px; font-weight:600; flex:1; }
+.activity-pts { font-size:11px; font-weight:800; color:var(--aqua-deep);
+  background:var(--turq-wash); padding:3px 10px; border-radius:12px;
+}
+
+/* ── Rewards ── */
+.reward-item {
+  padding:14px; display:flex; align-items:center; gap:12px;
+  border-radius:16px; background:var(--cream);
+  border:2px dashed var(--turq-pale); transition:all .15s;
+  margin-bottom:8px; cursor:pointer;
+}
+.reward-item:hover { border-color:var(--sunny); transform:rotate(-0.5deg); }
+.reward-emoji { font-size:28px; flex-shrink:0; }
+.reward-name { font-size:13px; font-weight:700; }
+.reward-desc { font-size:10px; color:var(--text-light); }
+.reward-cost {
+  margin-left:auto; font-family:'Caveat',cursive; font-size:18px;
+  font-weight:700; color:#B8860B; white-space:nowrap;
+}
+
+/* ── Leaderboard ── */
+.lb-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 0; border-bottom:2px dotted var(--turq-pale);
+}
+.lb-row:last-child { border-bottom:none; }
+.lb-rank {
+  width:28px; height:28px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center;
+  font-size:12px; font-weight:800; flex-shrink:0;
+}
+.lb-rank-1 { background:var(--sunny); color:#333; }
+.lb-rank-2 { background:#E0E0E0; color:#333; }
+.lb-rank-3 { background:#FFCC80; color:#333; }
+.lb-rank-n { background:var(--turq-wash); color:var(--aqua-deep); }
+.lb-name { font-size:12px; font-weight:700; flex:1; }
+.lb-class { font-size:10px; color:var(--text-light); }
+.lb-score { font-family:'Caveat',cursive; font-size:18px; font-weight:700; color:var(--aqua-deep); }
+
+/* ── Green Champions Timeline ── */
+.week-item {
+  display:flex; gap:14px; margin-bottom:16px; position:relative;
+}
+.week-dot {
+  width:36px; height:36px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0;
+  font-size:14px; font-weight:800; color:white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+.week-dot.done { background:var(--aqua); }
+.week-dot.current { background:var(--sunny); color:#333;
+  box-shadow:0 0 0 4px var(--sunny-pale), 0 2px 8px rgba(0,0,0,0.1);
+}
+.week-dot.upcoming { background:var(--craft-dark); }
+.week-line {
+  position:absolute; left:17px; top:36px; bottom:-16px;
+  width:3px; border-left:3px dashed var(--turq-pale);
+}
+.week-content { flex:1; padding:4px 0; }
+.week-title { font-size:13px; font-weight:700; }
+.week-desc { font-size:11px; color:var(--text-light); margin-top:2px; }
+.week-tag {
+  display:inline-block; font-size:9px; font-weight:700; padding:2px 8px;
+  border-radius:8px; margin-top:4px; text-transform:uppercase; letter-spacing:0.5px;
+}
+
+/* ── Clubs ── */
+.club-card {
+  padding:16px; text-align:center; border-radius:16px;
+  position:relative; overflow:hidden;
+}
+.club-card .club-emoji { font-size:32px; margin-bottom:6px; display:block; }
+.club-card .club-name { font-family:'Caveat',cursive; font-size:20px; font-weight:700; }
+.club-card .club-price { font-size:11px; font-weight:700; margin-top:4px; }
+.club-card .club-perk { font-size:10px; color:var(--text-light); margin-top:4px; }
+.club-join {
+  margin-top:10px; padding:6px 18px; border-radius:20px;
+  border:2px dashed; font-family:'Nunito',sans-serif;
+  font-size:11px; font-weight:800; cursor:pointer;
+  transition:all .15s; background:transparent;
+}
+.club-join:hover { transform:scale(1.05); }
+.club-join.joined {
+  background:var(--aqua)!important; color:white!important;
+  border-style:solid!important; cursor:default;
+}
+
+/* ── Toast ── */
+.toast-container {
+  position:fixed; top:80px; right:24px; z-index:9999;
+  display:flex; flex-direction:column; gap:8px; pointer-events:none;
+}
+.toast {
+  padding:12px 18px; border-radius:14px;
+  font-size:13px; font-weight:700;
+  box-shadow:0 6px 24px rgba(0,0,0,0.15);
+  animation: toastIn .4s ease, toastOut .4s ease 2.6s forwards;
+  display:flex; align-items:center; gap:10px;
+  border:2px dashed rgba(255,255,255,0.4);
+  max-width:340px; pointer-events:auto;
+}
+.toast-riplet { background:linear-gradient(135deg, #FFF4C8, #FFD93D); color:#7A6200; }
+.toast-xp { background:linear-gradient(135deg, var(--turq-wash), var(--turq)); color:var(--aqua-deep); }
+.toast-reward { background:linear-gradient(135deg, var(--leaf-pale), var(--leaf)); color:white; }
+.toast-club { background:linear-gradient(135deg, var(--plum-pale), var(--plum)); color:white; }
+.toast-badge { background:linear-gradient(135deg, var(--sunny-pale), var(--sunny)); color:#7A6200; }
+.toast-error { background:linear-gradient(135deg, var(--coral-pale), var(--coral)); color:white; }
+.toast-emoji { font-size:22px; }
+@keyframes toastIn { from { transform:translateX(120%); opacity:0; } to { transform:translateX(0); opacity:1; } }
+@keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateY(-10px); } }
+
+/* ── Confetti ── */
+.confetti-piece {
+  position:fixed; z-index:9998; pointer-events:none;
+  width:10px; height:10px; border-radius:2px;
+  animation: confettiFall 1.8s ease-out forwards;
+}
+@keyframes confettiFall {
+  0% { transform:translateY(0) rotate(0deg) scale(1); opacity:1; }
+  100% { transform:translateY(600px) rotate(720deg) scale(0.3); opacity:0; }
+}
+
+/* ── Activity card logged state ── */
+.activity-card { cursor:pointer; text-align:center; padding:24px; transition:all .2s; position:relative; overflow:hidden; }
+.activity-card:hover { border-color:var(--turq)!important; transform:rotate(-1deg) scale(1.02); }
+.activity-card.logged {
+  opacity:0.6; pointer-events:none;
+}
+.activity-card.logged::after {
+  content:'✓ Logged!'; position:absolute; top:8px; right:8px;
+  font-size:10px; font-weight:800; color:var(--leaf);
+  background:var(--leaf-pale); padding:2px 8px; border-radius:8px;
+  transform:rotate(3deg);
+}
+
+/* ── Reward button ── */
+.reward-btn {
+  padding:5px 12px; border-radius:14px; border:2px dashed var(--sunny);
+  background:var(--sunny-pale); color:#B8860B; font-size:10px; font-weight:800;
+  cursor:pointer; font-family:'Nunito',sans-serif; transition:all .15s;
+  white-space:nowrap;
+}
+.reward-btn:hover { background:var(--sunny); color:white; transform:scale(1.05); }
+.reward-btn.redeemed { background:var(--leaf-pale); border-color:var(--leaf); color:var(--leaf); cursor:default; pointer-events:none; }
+
+/* ── Checklist interactive ── */
+.check-interactive { cursor:pointer; transition:all .15s; }
+.check-interactive:hover { transform:translateX(4px); }
+
+/* ── Pulse animation for new earnings ── */
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+.pulse { animation: pulse .4s ease; }
+
+/* ── Charts (SVG) ── */
+.chart-wrap { width:100%; overflow:hidden; }
+.chart-wrap svg { display:block; }
+.ch-grid { stroke:var(--turq-pale); stroke-dasharray:4,4; stroke-width:1; }
+.ch-label { font-size:10px; fill:var(--text-light); font-family:'Nunito',sans-serif; font-weight:600; }
+.ch-line { fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.ch-area { opacity:0.1; }
+.ch-bar { rx:6; ry:6; }
+
+/* ── Global Challenge ── */
+.country-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 8px; border-bottom:2px dotted var(--turq-pale);
+  transition:all .15s;
+}
+.country-row:last-child { border-bottom:none; }
+.country-row:hover { background:var(--turq-wash); border-radius:10px; }
+.country-row.highlight { background:var(--sunny-pale); border-radius:10px; padding:10px 12px; margin:-2px -4px; }
+.country-flag { font-size:28px; width:36px; text-align:center; flex-shrink:0; }
+.country-rank {
+  width:26px; height:26px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center;
+  font-size:11px; font-weight:800; flex-shrink:0;
+}
+.country-bar-track {
+  height:8px; background:var(--turq-wash); border-radius:6px;
+  overflow:hidden; margin-top:4px; border:1px dashed var(--turq-pale);
+}
+.country-bar-fill {
+  height:100%; border-radius:4px;
+  transition:width .6s ease;
+}
+
+.challenge-card {
+  display:flex; align-items:center; gap:14px;
+  padding:14px; border-radius:14px; margin-bottom:10px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+  transition:all .15s; cursor:pointer;
+}
+.challenge-card:hover { border-color:var(--turq); transform:rotate(-0.3deg); }
+.challenge-vs {
+  font-family:'Caveat',cursive; font-size:20px; font-weight:700;
+  color:var(--coral); flex-shrink:0;
+}
+.challenge-progress {
+  flex:1; min-width:0;
+}
+.challenge-bar {
+  height:12px; background:var(--turq-wash); border-radius:8px;
+  overflow:hidden; position:relative; border:2px dashed var(--turq-pale);
+  display:flex;
+}
+.challenge-bar-left {
+  height:100%; background:linear-gradient(90deg, #FFD93D, #FFA726);
+  transition:width .4s;
+}
+.challenge-bar-right {
+  height:100%;
+  transition:width .4s;
+}
+
+/* Partner map grid */
+.partner-map-grid {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
+}
+.partner-card {
+  padding:14px 10px; text-align:center; border-radius:14px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+  transition:all .2s; cursor:pointer; position:relative;
+}
+.partner-card:hover { transform:scale(1.04) rotate(-1deg); border-color:var(--turq); box-shadow:var(--shadow-lg); }
+.partner-card.connected { border-color:var(--leaf); }
+.partner-card.connected::after {
+  content:'✓ Connected'; position:absolute; top:6px; right:6px;
+  font-size:8px; font-weight:800; color:var(--leaf);
+  background:var(--leaf-pale); padding:2px 6px; border-radius:6px;
+}
+.partner-flag { font-size:32px; display:block; margin-bottom:4px; }
+.partner-school { font-size:10px; font-weight:700; color:var(--aqua-deep); }
+.partner-country { font-size:9px; color:var(--text-light); font-weight:600; }
+
+.matchup-card {
+  display:flex; align-items:center; gap:12px;
+  padding:14px; border-radius:14px; margin-bottom:10px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+  transition:all .15s;
+}
+.matchup-card:hover { border-color:var(--sunny); }
+
+.exchange-msg {
+  display:flex; gap:10px; padding:10px 0;
+  border-bottom:2px dotted var(--turq-pale);
+}
+.exchange-msg:last-child { border-bottom:none; }
+
+.quest-item {
+  padding:12px; border-radius:12px; margin-bottom:8px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+  cursor:pointer; transition:all .15s;
+}
+.quest-item:hover { border-color:var(--turq); transform:translateX(3px); }
+.quest-item.quest-done { opacity:0.6; }
+.quest-item.quest-done::after { content:' ✓ Done'; font-size:10px; font-weight:800; color:var(--leaf); }
+
+@media(max-width:900px) {
+  .partner-map-grid { grid-template-columns:repeat(2, 1fr); }
+}
+
+/* ── Teacher Curriculum ── */
+.curr-week {
+  margin-bottom:14px; border-radius:16px; overflow:hidden;
+  border:2px dashed var(--turq-pale); background:var(--paper);
+  box-shadow:var(--shadow); transition:all .2s;
+}
+.curr-week:hover { box-shadow:var(--shadow-lg); }
+.curr-week.week-done { border-color:var(--leaf); }
+.curr-week.week-active { border-color:var(--sunny); box-shadow:0 0 0 3px var(--sunny-pale), var(--shadow-lg); }
+.curr-week-head {
+  display:flex; align-items:center; gap:14px; padding:16px 18px;
+  cursor:pointer; transition:background .15s;
+}
+.curr-week-head:hover { background:var(--turq-wash); }
+.curr-week-num {
+  width:42px; height:42px; border-radius:50%; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0;
+  font-family:'Caveat',cursive; font-size:20px; font-weight:700; color:white;
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+}
+.curr-week-num.done { background:var(--leaf); }
+.curr-week-num.active { background:var(--sunny); color:#333; box-shadow:0 0 0 4px var(--sunny-pale),0 2px 8px rgba(0,0,0,0.12); }
+.curr-week-num.upcoming { background:var(--craft-dark); }
+.curr-week-info { flex:1; min-width:0; }
+.curr-week-title { font-size:14px; font-weight:800; color:var(--aqua-deep); }
+.curr-week-theme { font-size:11px; color:var(--text-light); font-weight:600; margin-top:1px; }
+.curr-week-strands { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
+.curr-strand {
+  font-size:8px; font-weight:700; padding:2px 7px; border-radius:8px;
+  text-transform:uppercase; letter-spacing:0.3px;
+}
+.curr-week-arrow {
+  font-size:16px; color:var(--text-light); transition:transform .3s; flex-shrink:0;
+}
+.curr-week.open .curr-week-arrow { transform:rotate(180deg); }
+.curr-week-body {
+  display:none; padding:0 18px 18px;
+  border-top:2px dashed var(--turq-pale);
+}
+.curr-week.open .curr-week-body { display:block; }
+
+.lesson-block {
+  padding:14px; border-radius:12px; margin-top:12px;
+  background:var(--cream); border:2px dashed var(--turq-pale);
+}
+.lesson-title {
+  font-size:13px; font-weight:800; color:var(--aqua-deep);
+  display:flex; align-items:center; gap:6px;
+}
+.lesson-obj { font-size:11px; color:var(--text-light); margin-top:4px; line-height:1.5; }
+.lesson-activities {
+  margin-top:10px; display:flex; flex-direction:column; gap:6px;
+}
+.lesson-act {
+  display:flex; align-items:flex-start; gap:8px; font-size:11px;
+  font-weight:600; line-height:1.4;
+}
+.lesson-act-icon {
+  width:22px; height:22px; border-radius:6px; display:flex;
+  align-items:center; justify-content:center; font-size:11px; flex-shrink:0;
+  background:var(--turq-wash); color:var(--aqua-deep);
+}
+.lesson-smartloop {
+  margin-top:10px; padding:10px 12px; border-radius:10px;
+  background:linear-gradient(135deg, var(--turq-wash), var(--turq-pale));
+  border:2px dashed var(--turq);
+  font-size:11px; font-weight:700; color:var(--aqua-deep);
+  display:flex; align-items:center; gap:8px;
+}
+.lesson-assessment {
+  margin-top:10px; padding:8px 12px; border-radius:10px;
+  background:var(--sunny-pale); border:2px dashed var(--sunny);
+  font-size:10px; font-weight:700; color:#B8860B;
+}
+.curr-check {
+  display:flex; align-items:center; gap:8px; padding:6px 0;
+  font-size:11px; font-weight:600; cursor:pointer; transition:all .15s;
+}
+.curr-check:hover { transform:translateX(3px); }
+.curr-check-box {
+  width:18px; height:18px; border-radius:5px; display:inline-flex;
+  align-items:center; justify-content:center; font-size:10px;
+  font-weight:800; flex-shrink:0; transition:all .2s;
+  border:2px dashed var(--turq-pale); background:var(--cream);
+}
+.curr-check-box.checked {
+  background:var(--leaf-pale); border-color:var(--leaf); color:var(--leaf);
+}
+
+.resource-item {
+  display:flex; align-items:center; gap:12px; padding:10px 0;
+  border-bottom:2px dotted var(--turq-pale); transition:all .15s;
+}
+.resource-item:last-child { border-bottom:none; }
+.resource-item:hover { transform:translateX(3px); }
+.resource-icon {
+  width:38px; height:38px; border-radius:10px; display:flex;
+  align-items:center; justify-content:center; font-size:18px; flex-shrink:0;
+}
+
+/* ── Recycling Game ── */
+.game-start-btn {
+  padding:14px 28px; border-radius:16px; font-family:'Nunito',sans-serif;
+  font-size:15px; font-weight:800; cursor:pointer; border:3px dashed var(--turq);
+  background:linear-gradient(135deg, var(--turq-wash), var(--turq-pale));
+  color:var(--aqua-deep); transition:all .15s;
+}
+.game-start-btn:hover { transform:scale(1.06) rotate(-1deg); box-shadow:var(--shadow-lg); }
+
+.game-hud {
+  display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; justify-content:center;
+}
+.game-hud-item {
+  display:flex; align-items:center; gap:5px; padding:8px 14px;
+  border-radius:14px; font-size:13px; font-weight:800;
+  border:2px dashed; white-space:nowrap;
+}
+
+.game-arena {
+  padding:20px; position:relative; overflow:hidden;
+  min-height:360px;
+}
+
+.game-streak-bar {
+  display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:6px;
+}
+.game-streak-dot {
+  width:24px; height:24px; border-radius:50%; display:inline-flex;
+  align-items:center; justify-content:center; font-size:12px; font-weight:800;
+  background:var(--craft); color:var(--text-light); border:2px dashed var(--craft-dark);
+  transition:all .3s;
+}
+.game-streak-dot.lit {
+  background:var(--sunny); color:#333; border-color:var(--sunny);
+  transform:scale(1.15); box-shadow:0 0 8px rgba(255,217,61,0.5);
+}
+
+.game-timer-track {
+  height:8px; background:var(--turq-wash); border-radius:6px;
+  margin:16px 0; overflow:hidden; border:2px dashed var(--turq-pale);
+}
+.game-timer-fill {
+  height:100%; background:linear-gradient(90deg, var(--aqua), var(--turq));
+  border-radius:4px; transition:width 0.1s linear;
+  width:100%;
+}
+.game-timer-fill.danger { background:linear-gradient(90deg, var(--coral), #FF4444); }
+
+.game-bins {
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:8px;
+}
+.game-bin {
+  display:flex; flex-direction:column; align-items:center; gap:4px;
+  padding:16px 8px; border-radius:16px;
+  background:var(--bin-bg); border:3px dashed var(--bin-color);
+  cursor:pointer; transition:all .12s;
+  font-family:'Nunito',sans-serif;
+}
+.game-bin:hover { transform:scale(1.06); box-shadow:0 4px 16px rgba(0,0,0,0.12); }
+.game-bin:active { transform:scale(0.95); }
+.game-bin-emoji { font-size:32px; }
+.game-bin-label { font-size:11px; font-weight:800; color:var(--bin-color); }
+
+.game-bin.correct-flash { animation:binCorrect .5s ease; }
+@keyframes binCorrect {
+  0%{transform:scale(1)} 20%{transform:scale(1.12); box-shadow:0 0 20px rgba(76,175,80,0.4)} 100%{transform:scale(1)}
+}
+.game-bin.wrong-flash { animation:binWrong .5s ease; }
+@keyframes binWrong {
+  0%,100%{transform:translateX(0)} 15%{transform:translateX(-6px)} 30%{transform:translateX(6px)} 45%{transform:translateX(-4px)} 60%{transform:translateX(4px)}
+}
+
+.game-feedback {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:'Caveat',cursive; font-size:48px; font-weight:700;
+  pointer-events:none; z-index:9999; opacity:0;
+  text-shadow:0 3px 12px rgba(0,0,0,0.2);
+}
+.game-feedback.show { animation:feedPop .8s ease forwards; }
+@keyframes feedPop {
+  0%{opacity:0; transform:translate(-50%,-50%) scale(0.5)} 20%{opacity:1; transform:translate(-50%,-50%) scale(1.2)}
+  50%{transform:translate(-50%,-50%) scale(1)} 100%{opacity:0; transform:translate(-50%,-80%) scale(0.8)}
+}
+
+.game-item-enter { animation:itemDrop .4s ease; }
+@keyframes itemDrop {
+  0%{opacity:0; transform:translateY(-40px) scale(0.7)} 100%{opacity:1; transform:translateY(0) scale(1)}
+}
+
+@media(max-width:600px) {
+  .game-bins { grid-template-columns:repeat(2, 1fr); }
+}
+
+/* ── Profile Switcher ── */
+.profile-switcher {
+  padding:8px 16px 0; border-top:2px dashed var(--turq-pale);
+}
+.profile-switcher-label {
+  font-family:'Caveat',cursive; font-size:13px; font-weight:700;
+  color:var(--aqua); margin-bottom:6px; text-align:center;
+}
+.profile-option {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; border-radius:10px; cursor:pointer;
+  transition:all .15s; margin-bottom:4px; border:2px solid transparent;
+}
+.profile-option:hover { background:var(--turq-wash); }
+.profile-option.active-profile {
+  background:linear-gradient(135deg, var(--turq-wash), var(--turq-pale));
+  border:2px dashed var(--turq);
+}
+.profile-avatar {
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; border:2px solid white;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1); flex-shrink:0;
+}
+.profile-name { font-size:11px; font-weight:700; }
+.profile-detail { font-size:9px; color:var(--text-light); font-weight:600; }
+
+/* ── Pagination (pages) ── */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ── Decorative ── */
+.corner-doodle {
+  position:absolute; opacity:0.06; pointer-events:none;
+  font-size:80px;
+}
+
+/* ── Responsive ── */
+@media(max-width:1100px) {
+  .g4 { grid-template-columns:repeat(2,1fr); }
+  .g3,.g-main { grid-template-columns:1fr; }
+}
+@media(max-width:768px) {
+  .sidebar { display:none; }
+  .main { margin-left:0; }
+  .g2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════ SIDEBAR ════════ -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-circle">SL</div>
+    <div class="logo-name">SmartLoop</div>
+    <div class="logo-tag">by ThinkOS</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">My Journey</div>
+      <button class="nav-btn active" onclick="showPage('dashboard',this)">
+        <span class="nav-emoji">🌍</span> My Dashboard
+      </button>
+      <button class="nav-btn" onclick="showPage('activities',this)">
+        <span class="nav-emoji">📝</span> Log Activity
+        <span class="nav-badge">+</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('badges',this)">
+        <span class="nav-emoji">🏆</span> EcoHero Badges
+      </button>
+      <button class="nav-btn" onclick="showPage('rewards',this)">
+        <span class="nav-emoji">🎁</span> Rewards Shop
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">School</div>
+      <button class="nav-btn" onclick="showPage('bins',this)">
+        <span class="nav-emoji">🗑️</span> Live Bin Status
+        <span class="nav-badge">3</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('leaderboard',this)">
+        <span class="nav-emoji">📊</span> Leaderboard
+      </button>
+      <button class="nav-btn" onclick="showPage('champions',this)">
+        <span class="nav-emoji">🌱</span> Green Champions
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Global</div>
+      <button class="nav-btn" onclick="showPage('global',this)">
+        <span class="nav-emoji">🌏</span> Global Challenge
+        <span class="nav-badge">LIVE</span>
+      </button>
+      <button class="nav-btn" onclick="showPage('exchange',this)">
+        <span class="nav-emoji">🤝</span> School Exchange
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Play</div>
+      <button class="nav-btn" onclick="showPage('game',this)">
+        <span class="nav-emoji">🎮</span> Recycling Game
+        <span class="nav-badge">NEW</span>
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Clubs</div>
+      <button class="nav-btn" onclick="showPage('clubs',this)">
+        <span class="nav-emoji">⭐</span> Riplet Clubs
+      </button>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Teachers</div>
+      <button class="nav-btn" onclick="showPage('curriculum',this)">
+        <span class="nav-emoji">📖</span> Curriculum
+        <span class="nav-badge">8 WK</span>
+      </button>
+    </div>
+  </div>
+  <div class="profile-switcher">
+    <div class="profile-switcher-label">Switch EcoHero</div>
+    <div id="profile-list"></div>
+  </div>
+  <div class="sidebar-footer" id="active-profile-footer">
+    <div class="user-avatar" id="footer-avatar">🌊</div>
+    <div>
+      <div class="user-name" id="footer-name">EcoHero Rory</div>
+      <div class="user-level" id="footer-level">Level 12 · Reef Ranger</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MAIN ════════ -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="page-title">My Earth-Saving Journey</div>
+      <div class="topbar-sub" id="page-sub">Welcome back! Your planet thanks you.</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-stat streak-stat" id="stat-streak">🔥 14 day streak</div>
+      <div class="topbar-stat riplet-stat" id="stat-riplets">💧 1,240 Riplets</div>
+      <div class="topbar-stat xp-stat" id="stat-xp">⚡ 3,680 XP</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="pg-dashboard" class="page active">
+      <!-- Impact Cards -->
+      <div class="g4">
+        <div class="card impact-card" style="border-color:var(--leaf-pale)">
+          <span class="impact-emoji">🌳</span>
+          <div class="impact-val" style="color:var(--leaf)">12</div>
+          <div class="impact-label">Trees Saved</div>
+          <div class="impact-fun">"That's a mini forest!"</div>
+        </div>
+        <div class="card impact-card" style="border-color:var(--turq-pale)">
+          <span class="impact-emoji">♻️</span>
+          <div class="impact-val" style="color:var(--aqua-deep)">48kg</div>
+          <div class="impact-label">Waste Rescued</div>
+          <div class="impact-fun">"Like saving a big dog's weight!"</div>
+        </div>
+        <div class="card impact-card" style="border-color:var(--sky-pale)">
+          <span class="impact-emoji">💨</span>
+          <div class="impact-val" style="color:var(--sky)">32kg</div>
+          <div class="impact-label">CO₂ Saved</div>
+          <div class="impact-fun">"That's 160km of car travel!"</div>
+        </div>
+        <div class="card impact-card" style="border-color:var(--plum-pale)">
+          <span class="impact-emoji">💧</span>
+          <div class="impact-val" style="color:var(--plum)">840L</div>
+          <div class="impact-label">Water Saved</div>
+          <div class="impact-fun">"Enough to fill 5 bathtubs!"</div>
+        </div>
+      </div>
+
+      <!-- Level Progress + Recent Activity -->
+      <div class="g-main">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">EcoHero Progress</div>
+              <div class="card-st">Level 12 → Level 13</div>
+            </div>
+            <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep)">🦸 Waste Wizard</div>
+          </div>
+          <div class="card-bd">
+            <!-- XP bar -->
+            <div style="margin-bottom:18px">
+              <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:6px">
+                <span>3,680 / 4,500 XP</span>
+                <span style="color:var(--aqua)">82%</span>
+              </div>
+              <div style="height:14px; background:var(--turq-wash); border-radius:10px; overflow:hidden; border:2px dashed var(--turq-pale)">
+                <div style="width:82%; height:100%; background:linear-gradient(90deg, var(--aqua), var(--turq)); border-radius:8px;
+                  background-size:20px 20px;
+                  background-image:linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%);">
+                </div>
+              </div>
+              <div style="font-size:10px; color:var(--text-light); margin-top:4px; font-weight:600">820 XP to next level — keep going!</div>
+            </div>
+            <!-- Weekly chart -->
+            <div class="chart-wrap" id="weekly-chart"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">Recent Activity</div>
+              <div class="card-st">Today's eco actions</div>
+            </div>
+          </div>
+          <div class="card-bd" id="recent-activity"></div>
+        </div>
+      </div>
+
+      <!-- Quick badges preview -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head">
+          <div>
+            <div class="card-t">Next Badges to Earn</div>
+            <div class="card-st">You're so close!</div>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div class="g3" style="margin-bottom:0">
+            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--turq-wash); border-radius:12px; border:2px dashed var(--turq-pale)">
+              <span style="font-size:32px">⚔️</span>
+              <div>
+                <div style="font-size:12px; font-weight:700">Sorting Superstar</div>
+                <div style="font-size:10px; color:var(--text-light)">42/50 items sorted</div>
+                <div style="height:6px; background:var(--turq-pale); border-radius:4px; margin-top:4px; width:120px">
+                  <div style="width:84%; height:100%; background:var(--aqua); border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--leaf-pale); border-radius:12px; border:2px dashed var(--leaf)">
+              <span style="font-size:32px">🌿</span>
+              <div>
+                <div style="font-size:12px; font-weight:700">Carbon Warrior</div>
+                <div style="font-size:10px; color:var(--text-light)">18/25 kg CO₂ saved</div>
+                <div style="height:6px; background:#B8E6B8; border-radius:4px; margin-top:4px; width:120px">
+                  <div style="width:72%; height:100%; background:var(--leaf); border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--sky-pale); border-radius:12px; border:2px dashed var(--sky)">
+              <span style="font-size:32px">🌲</span>
+              <div>
+                <div style="font-size:12px; font-weight:700">Forest Guardian</div>
+                <div style="font-size:10px; color:var(--text-light)">3/5 trees equivalent</div>
+                <div style="height:6px; background:#B3D4F7; border-radius:4px; margin-top:4px; width:120px">
+                  <div style="width:60%; height:100%; background:var(--sky); border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ACTIVITIES (Log) ═══ -->
+    <div id="pg-activities" class="page">
+      <div class="g3" id="activity-cards"></div>
+      <div class="card" style="margin-top:4px">
+        <div class="card-head"><div class="card-t">Today's Log</div><div class="card-st" id="today-log-count">0 activities logged today</div></div>
+        <div class="card-bd" id="today-log"></div>
+      </div>
+    </div>
+
+    <!-- ═══ BADGES ═══ -->
+    <div id="pg-badges" class="page">
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head"><div class="card-t">Waste Warrior Badges</div></div>
+        <div class="card-bd">
+          <div class="badge-grid" id="waste-badges"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head"><div class="card-t">Carbon Crusher Badges</div></div>
+        <div class="card-bd">
+          <div class="badge-grid" id="carbon-badges"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-t">Tree Saver Badges</div></div>
+        <div class="card-bd">
+          <div class="badge-grid" id="tree-badges"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ REWARDS ═══ -->
+    <div id="pg-rewards" class="page">
+      <div class="card" style="margin-bottom:20px; padding:16px; text-align:center; background:linear-gradient(135deg, var(--turq-wash), var(--sunny-pale))">
+        <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:var(--aqua-deep)">Your Riplets Balance</div>
+        <div style="font-family:'Caveat',cursive; font-size:52px; font-weight:700; color:#B8860B" id="rewards-balance">💧 1,240</div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-t">Real Rewards</div></div>
+          <div class="card-bd" id="real-rewards"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-t">Virtual Rewards</div></div>
+          <div class="card-bd" id="virtual-rewards"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BINS ═══ -->
+    <div id="pg-bins" class="page">
+      <div class="g3" id="bin-cards"></div>
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-t">Fill Levels Over Time</div>
+            <div class="card-st">Today's bin fill trend across campus</div>
+          </div>
+          <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep)">● Live</div>
+        </div>
+        <div class="card-bd">
+          <div class="chart-wrap" id="bin-trend-chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LEADERBOARD ═══ -->
+    <div id="pg-leaderboard" class="page">
+      <div class="g2">
+        <div class="card">
+          <div class="card-head"><div class="card-t">Top EcoHeroes This Week</div></div>
+          <div class="card-bd" id="student-lb"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-t">Class Challenge</div></div>
+          <div class="card-bd" id="class-lb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ GREEN CHAMPIONS ═══ -->
+    <div id="pg-champions" class="page">
+      <div class="g-main">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">8-Week Green Champions Program</div>
+              <div class="card-st">Week 4 of 8 — The 4 E's: Explore → Engage → Empower → Execute</div>
+            </div>
+          </div>
+          <div class="card-bd" id="timeline"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-t">This Week's Focus</div></div>
+          <div class="card-bd">
+            <div style="text-align:center; padding:10px 0">
+              <span style="font-size:48px; display:block; margin-bottom:8px">🔧</span>
+              <div style="font-family:'Caveat',cursive; font-size:24px; font-weight:700; color:var(--aqua-deep)">Reuse & Repair</div>
+              <div style="font-size:11px; color:var(--text-light); margin-top:4px; max-width:200px; margin-left:auto; margin-right:auto">
+                Creative reuse techniques and upcycling projects
+              </div>
+              <div style="margin-top:14px; display:flex; flex-direction:column; gap:8px; text-align:left" id="week-checklist"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ GLOBAL CHALLENGE ═══ -->
+    <div id="pg-global" class="page">
+
+      <!-- Live World Scoreboard Banner -->
+      <div class="card global-banner" style="margin-bottom:20px; padding:20px 24px; background:linear-gradient(135deg, #E0FAF5 0%, #B2F5EA 40%, #DCEEFB 70%, #EDE0FF 100%); position:relative; overflow:hidden">
+        <div class="tape" style="top:-2px; left:30px"></div>
+        <div class="tape tape-r" style="top:-2px; right:30px"></div>
+        <div style="text-align:center; position:relative; z-index:1">
+          <div style="font-family:'Caveat',cursive; font-size:32px; font-weight:700; color:var(--aqua-deep)">🌍 Global EcoChallenge 2026</div>
+          <div style="font-size:12px; color:var(--text-light); font-weight:600; margin-top:2px">8 countries · 156 schools · 24,800 students saving the planet together</div>
+          <div style="display:flex; gap:12px; justify-content:center; margin-top:14px; flex-wrap:wrap">
+            <div class="sticker" style="background:var(--sunny-pale); color:#B8860B; transform:rotate(-2deg)">🏆 Season 3 Active</div>
+            <div class="sticker" style="background:var(--leaf-pale); color:var(--leaf); transform:rotate(1deg)">🌿 42 days remaining</div>
+            <div class="sticker" style="background:var(--coral-pale); color:#C62828; transform:rotate(-1deg)">🔥 Australia is #2!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Country Leaderboard -->
+      <div class="g-main" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">🏅 Country Leaderboard</div>
+              <div class="card-st">Total eco-points across all schools per country</div>
+            </div>
+            <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep)">● Live</div>
+          </div>
+          <div class="card-bd" id="country-lb"></div>
+        </div>
+
+        <!-- Your Country Stats -->
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">🇦🇺 Australia's Standing</div>
+              <div class="card-st">Our combined national effort</div>
+            </div>
+          </div>
+          <div class="card-bd">
+            <div style="text-align:center; padding:8px 0">
+              <div style="font-size:52px; margin-bottom:4px">🇦🇺</div>
+              <div style="font-family:'Caveat',cursive; font-size:36px; font-weight:700; color:var(--aqua-deep)">2nd Place</div>
+              <div style="font-size:11px; color:var(--text-light); font-weight:600">18 schools · 3,200 students</div>
+              <div style="margin:14px auto; max-width:200px">
+                <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:700; margin-bottom:4px">
+                  <span>Catching Sweden</span>
+                  <span style="color:var(--coral)">1,240 pts behind</span>
+                </div>
+                <div style="height:10px; background:var(--turq-wash); border-radius:6px; overflow:hidden; border:2px dashed var(--turq-pale)">
+                  <div style="width:88%; height:100%; background:linear-gradient(90deg, #FFD93D, #40E0D0); border-radius:4px"></div>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; text-align:center">
+                <div style="background:var(--sunny-pale); border-radius:10px; padding:10px; border:2px dashed var(--sunny)">
+                  <div style="font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:#B8860B">184,600</div>
+                  <div style="font-size:9px; font-weight:700; color:var(--text-light)">Total Eco-Points</div>
+                </div>
+                <div style="background:var(--leaf-pale); border-radius:10px; padding:10px; border:2px dashed var(--leaf)">
+                  <div style="font-family:'Caveat',cursive; font-size:22px; font-weight:700; color:var(--leaf)">2,840 kg</div>
+                  <div style="font-size:9px; font-weight:700; color:var(--text-light)">CO₂ Saved</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Cross-Country Challenges -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head">
+          <div>
+            <div class="card-t">⚔️ Cross-Country Challenges</div>
+            <div class="card-st">Head-to-head country battles — contribute to win!</div>
+          </div>
+        </div>
+        <div class="card-bd" id="country-challenges"></div>
+      </div>
+
+      <!-- Global Collaborative Goal -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head">
+          <div>
+            <div class="card-t">🌍 United Goal: Plant 10,000 Trees</div>
+            <div class="card-st">All 8 countries working together on one mission</div>
+          </div>
+          <div class="sticker" style="background:var(--leaf-pale); color:var(--leaf)">🌲 Global Co-Op</div>
+        </div>
+        <div class="card-bd">
+          <div style="margin-bottom:12px">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:700; margin-bottom:6px">
+              <span>7,340 / 10,000 trees equivalent</span>
+              <span style="color:var(--leaf)">73.4%</span>
+            </div>
+            <div style="height:18px; background:var(--turq-wash); border-radius:10px; overflow:hidden; border:2px dashed var(--turq-pale); position:relative">
+              <div style="width:73.4%; height:100%; background:linear-gradient(90deg, #4CAF50, #81C784); border-radius:8px; position:relative">
+                <div style="position:absolute; right:4px; top:50%; transform:translateY(-50%); font-size:10px">🌲</div>
+              </div>
+            </div>
+          </div>
+          <div id="collab-country-bars"></div>
+          <div style="text-align:center; margin-top:14px; font-size:11px; color:var(--text-light); font-weight:600; font-style:italic">
+            "When we planted 10,000 trees as one planet — every Riplet counted." 🌏
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Schools Worldwide -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-t">🏫 Top Schools Worldwide</div>
+            <div class="card-st">The best eco-schools across all countries</div>
+          </div>
+        </div>
+        <div class="card-bd" id="global-school-lb"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SCHOOL EXCHANGE ═══ -->
+    <div id="pg-exchange" class="page">
+
+      <!-- Partner Schools Map -->
+      <div class="card" style="margin-bottom:20px; padding:20px; position:relative; overflow:hidden">
+        <div class="tape" style="top:-2px; left:30px"></div>
+        <div style="text-align:center; margin-bottom:16px">
+          <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:var(--aqua-deep)">🗺️ Our Partner Schools Network</div>
+          <div style="font-size:11px; color:var(--text-light); font-weight:600">Your school is connected to 7 partner schools — one per country!</div>
+        </div>
+        <div id="partner-map" class="partner-map-grid"></div>
+      </div>
+
+      <!-- Active School Matchups -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head">
+          <div>
+            <div class="card-t">⚡ Active School Matchups</div>
+            <div class="card-st">Weekly 1v1 challenges with partner schools</div>
+          </div>
+          <div class="sticker" style="background:var(--coral-pale); color:#C62828; transform:rotate(2deg)">🔥 This Week</div>
+        </div>
+        <div class="card-bd" id="school-matchups"></div>
+      </div>
+
+      <!-- Cultural Exchange Feed -->
+      <div class="g2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">💬 Exchange Wall</div>
+              <div class="card-st">Messages & tips from partner schools</div>
+            </div>
+          </div>
+          <div class="card-bd" id="exchange-wall"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-t">🎯 Cultural Eco-Quests</div>
+              <div class="card-st">Learn sustainability traditions from each country</div>
+            </div>
+          </div>
+          <div class="card-bd" id="eco-quests"></div>
+        </div>
+      </div>
+
+      <!-- Global Achievements -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-t">🌟 Global Badges</div>
+            <div class="card-st">Earn badges by connecting with schools worldwide</div>
+          </div>
+        </div>
+        <div class="card-bd">
+          <div class="badge-grid" id="global-badges"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RECYCLING GAME ═══ -->
+    <div id="pg-game" class="page">
+      <!-- Pre-game -->
+      <div id="game-intro" class="card" style="text-align:center; padding:40px 24px; margin-bottom:20px">
+        <div style="font-size:64px; margin-bottom:12px">🎮</div>
+        <div style="font-family:'Caveat',cursive; font-size:36px; font-weight:700; color:var(--aqua-deep)">Sort It Out!</div>
+        <div style="font-size:14px; color:var(--text-light); margin:8px auto 0; max-width:420px; line-height:1.6">
+          Waste items will appear — tap the correct bin to sort them!<br>
+          <b style="color:var(--aqua-deep)">Correct = +5 Riplets</b> &nbsp;·&nbsp; <b style="color:var(--coral)">Wrong = lose a life</b><br>
+          Get 3 streak bonus multipliers and earn even more!
+        </div>
+        <div style="display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap">
+          <button class="game-start-btn" onclick="startGame('easy')">
+            🌱 Easy<span style="display:block; font-size:10px; font-weight:600; opacity:0.7">6 seconds</span>
+          </button>
+          <button class="game-start-btn" onclick="startGame('medium')" style="background:linear-gradient(135deg, var(--sunny-pale), var(--sunny)); color:#7A6200; border-color:var(--sunny)">
+            ⚡ Medium<span style="display:block; font-size:10px; font-weight:600; opacity:0.7">4 seconds</span>
+          </button>
+          <button class="game-start-btn" onclick="startGame('hard')" style="background:linear-gradient(135deg, var(--coral-pale), var(--coral)); color:white; border-color:var(--coral)">
+            🔥 Hard<span style="display:block; font-size:10px; font-weight:600; opacity:0.7">2.5 seconds</span>
+          </button>
+        </div>
+        <div id="game-high-score" style="margin-top:16px; font-size:12px; color:var(--aqua); font-weight:700"></div>
+      </div>
+
+      <!-- Active Game -->
+      <div id="game-active" style="display:none">
+        <!-- HUD -->
+        <div class="game-hud">
+          <div class="game-hud-item" style="background:var(--sunny-pale); border-color:var(--sunny); color:#B8860B">
+            <span>💧</span> <span id="game-riplets">0</span> Riplets
+          </div>
+          <div class="game-hud-item" style="background:var(--turq-wash); border-color:var(--turq); color:var(--aqua-deep)">
+            <span>📦</span> <span id="game-sorted">0</span> / <span id="game-total">0</span>
+          </div>
+          <div class="game-hud-item" style="background:var(--plum-pale); border-color:var(--plum); color:#6A1B9A">
+            🔥 x<span id="game-mult">1</span>
+          </div>
+          <div class="game-hud-item" id="game-lives-display" style="background:var(--coral-pale); border-color:var(--coral); color:#C62828">
+            ❤️ <span id="game-lives">3</span>
+          </div>
+          <div class="game-hud-item" style="background:var(--leaf-pale); border-color:var(--leaf); color:var(--leaf)">
+            ⏱️ <span id="game-timer">6.0</span>s
+          </div>
+        </div>
+
+        <!-- Game arena -->
+        <div class="card game-arena" id="game-arena">
+          <!-- Streak indicator -->
+          <div id="game-streak-bar" class="game-streak-bar">
+            <div class="game-streak-dot" id="gs0">○</div>
+            <div class="game-streak-dot" id="gs1">○</div>
+            <div class="game-streak-dot" id="gs2">○</div>
+            <span style="font-size:11px; font-weight:700; color:var(--text-light); margin-left:4px">streak</span>
+          </div>
+
+          <!-- The item to sort -->
+          <div id="game-item-zone" style="text-align:center; padding:30px 0 20px">
+            <div id="game-item-emoji" style="font-size:72px; transition:all .3s"></div>
+            <div id="game-item-name" style="font-family:'Caveat',cursive; font-size:26px; font-weight:700; color:var(--aqua-deep); margin-top:4px"></div>
+            <div id="game-item-hint" style="font-size:11px; color:var(--text-light); margin-top:2px; font-weight:600"></div>
+          </div>
+
+          <!-- Timer bar -->
+          <div class="game-timer-track">
+            <div class="game-timer-fill" id="game-timer-fill"></div>
+          </div>
+
+          <!-- Bins to tap -->
+          <div class="game-bins">
+            <button class="game-bin" data-bin="landfill" onclick="sortItem('landfill')" style="--bin-color:#6B6B6B; --bin-bg:#F0F0F0">
+              <span class="game-bin-emoji">🗑️</span>
+              <span class="game-bin-label">Landfill</span>
+            </button>
+            <button class="game-bin" data-bin="recycling" onclick="sortItem('recycling')" style="--bin-color:#5B7FA5; --bin-bg:#D6E4EF">
+              <span class="game-bin-emoji">♻️</span>
+              <span class="game-bin-label">Recycling</span>
+            </button>
+            <button class="game-bin" data-bin="compost" onclick="sortItem('compost')" style="--bin-color:#7BAF6E; --bin-bg:#D5EACF">
+              <span class="game-bin-emoji">🥬</span>
+              <span class="game-bin-label">Compost</span>
+            </button>
+            <button class="game-bin" data-bin="paper" onclick="sortItem('paper')" style="--bin-color:#D4956A; --bin-bg:#F5E3D2">
+              <span class="game-bin-emoji">📄</span>
+              <span class="game-bin-label">Paper</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Feedback overlay -->
+        <div id="game-feedback" class="game-feedback"></div>
+      </div>
+
+      <!-- Game Over -->
+      <div id="game-over" style="display:none">
+        <div class="card" style="text-align:center; padding:40px 24px">
+          <div id="game-over-emoji" style="font-size:64px; margin-bottom:8px">🏆</div>
+          <div style="font-family:'Caveat',cursive; font-size:36px; font-weight:700; color:var(--aqua-deep)" id="game-over-title">Great Sorting!</div>
+          <div style="display:flex; gap:16px; justify-content:center; margin:20px 0; flex-wrap:wrap">
+            <div class="card" style="padding:14px 20px; text-align:center; border-color:var(--sunny)">
+              <div style="font-size:28px">💧</div>
+              <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:#B8860B" id="game-over-riplets">0</div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-light)">Riplets Earned</div>
+            </div>
+            <div class="card" style="padding:14px 20px; text-align:center; border-color:var(--leaf)">
+              <div style="font-size:28px">✅</div>
+              <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:var(--leaf)" id="game-over-correct">0</div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-light)">Correct Sorts</div>
+            </div>
+            <div class="card" style="padding:14px 20px; text-align:center; border-color:var(--aqua)">
+              <div style="font-size:28px">🔥</div>
+              <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:var(--aqua-deep)" id="game-over-best-streak">0</div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-light)">Best Streak</div>
+            </div>
+            <div class="card" style="padding:14px 20px; text-align:center; border-color:var(--plum)">
+              <div style="font-size:28px">📊</div>
+              <div style="font-family:'Caveat',cursive; font-size:28px; font-weight:700; color:var(--plum)" id="game-over-accuracy">0%</div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-light)">Accuracy</div>
+            </div>
+          </div>
+          <div id="game-over-msg" style="font-size:13px; color:var(--text-light); margin-bottom:20px; font-weight:600"></div>
+          <div style="display:flex; gap:12px; justify-content:center">
+            <button class="game-start-btn" onclick="restartGame()">🔄 Play Again</button>
+            <button class="game-start-btn" onclick="showGameIntro()" style="background:var(--paper); color:var(--aqua-deep); border-color:var(--turq-pale)">🏠 Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CLUBS ═══ -->
+    <div id="pg-clubs" class="page">
+      <div class="g3" id="clubs-grid"></div>
+    </div>
+
+    <!-- ═══ TEACHER'S CURRICULUM ═══ -->
+    <div id="pg-curriculum" class="page">
+
+      <!-- Overview Banner -->
+      <div class="card" style="margin-bottom:20px; padding:24px; background:linear-gradient(135deg, var(--turq-wash) 0%, var(--leaf-pale) 50%, var(--sunny-pale) 100%); position:relative; overflow:hidden">
+        <div class="tape" style="top:-2px; left:30px"></div>
+        <div class="tape tape-r" style="top:-2px; right:30px"></div>
+        <div style="display:flex; align-items:center; gap:24px; flex-wrap:wrap">
+          <div style="flex:1; min-width:280px">
+            <div style="font-family:'Caveat',cursive; font-size:30px; font-weight:700; color:var(--aqua-deep)">📖 Waste & Sustainability Curriculum</div>
+            <div style="font-size:12px; color:var(--text-light); margin-top:4px; line-height:1.6; max-width:520px">
+              An 8-week structured program for Years 3–6 integrating waste education, environmental science, and sustainability practices. Aligned to the <b style="color:var(--aqua-deep)">Australian Curriculum</b> across Science, HASS, Technologies, and cross-curriculum priorities.
+            </div>
+            <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap">
+              <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep)">🎓 Years 3–6</div>
+              <div class="sticker" style="background:var(--leaf-pale); color:var(--leaf)">🌿 Cross-Curricular</div>
+              <div class="sticker" style="background:var(--sunny-pale); color:#B8860B">🏫 SmartLoop Integrated</div>
+              <div class="sticker" style="background:var(--plum-pale); color:#6A1B9A">📊 ACARA Aligned</div>
+            </div>
+          </div>
+          <div style="text-align:center; flex-shrink:0">
+            <div style="font-family:'Caveat',cursive; font-size:48px; font-weight:700; color:var(--aqua-deep)" id="curr-progress-pct">37%</div>
+            <div style="font-size:10px; font-weight:700; color:var(--text-light)">Program Progress</div>
+            <div style="width:120px; height:10px; background:var(--turq-wash); border-radius:6px; overflow:hidden; border:2px dashed var(--turq-pale); margin-top:6px">
+              <div id="curr-progress-bar" style="width:37%; height:100%; background:linear-gradient(90deg, var(--aqua), var(--leaf)); border-radius:4px; transition:width .4s"></div>
+            </div>
+            <div style="font-size:9px; color:var(--aqua); font-weight:700; margin-top:4px" id="curr-progress-text">3 of 8 weeks complete</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Curriculum Strand Key -->
+      <div class="card" style="margin-bottom:20px; padding:14px 18px">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px">
+          <div class="card-t" style="font-size:17px">📚 Curriculum Strands</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap">
+          <div class="sticker" style="background:#E3F2FD; color:#1565C0; transform:none; font-size:10px">🔬 Science</div>
+          <div class="sticker" style="background:#FFF3E0; color:#E65100; transform:none; font-size:10px">🌏 HASS</div>
+          <div class="sticker" style="background:#F3E5F5; color:#6A1B9A; transform:none; font-size:10px">⚙️ Technologies</div>
+          <div class="sticker" style="background:#E8F5E9; color:#2E7D32; transform:none; font-size:10px">🔢 Mathematics</div>
+          <div class="sticker" style="background:#FFFDE7; color:#F57F17; transform:none; font-size:10px">✏️ English</div>
+          <div class="sticker" style="background:#FCE4EC; color:#C62828; transform:none; font-size:10px">🎨 The Arts</div>
+          <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep); transform:none; font-size:10px">💧 SmartLoop Activity</div>
+        </div>
+      </div>
+
+      <!-- 8-Week Cards -->
+      <div id="curriculum-weeks"></div>
+
+      <!-- Printable Resources -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-head">
+          <div>
+            <div class="card-t">📎 Teacher Resources</div>
+            <div class="card-st">Printable materials and assessment guides</div>
+          </div>
+        </div>
+        <div class="card-bd" id="teacher-resources"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+/* ═══════════════════════════════════════
+   STATE ENGINE
+   ═══════════════════════════════════════ */
+const state = {
+  riplets: 1240,
+  xp: 3680,
+  streak: 14,
+  level: 12,
+  xpToNext: 4500,
+  title: 'Waste Wizard',
+  todayLog: [],
+  loggedToday: {},  // track which activities logged today
+  redeemedRewards: {},
+  joinedClubs: {},
+  checklist: { 0:true, 1:true, 2:false, 3:false },
+};
+
+/* ═══════ ECOHERO PROFILES ═══════ */
+const profiles = [
+  {
+    id:'rory', name:'Rory', surname:'Luxford', age:10, emoji:'🌊',
+    avatarBg:'linear-gradient(135deg, var(--sky), var(--aqua))',
+    riplets:1240, xp:3680, streak:14, level:12, xpToNext:4500, title:'Reef Ranger',
+    cls:'5B', school:'City Beach PS',
+  },
+  {
+    id:'kelly', name:'Kelly', surname:'Luxford', age:7, emoji:'🌸',
+    avatarBg:'linear-gradient(135deg, var(--plum), var(--coral))',
+    riplets:620, xp:1860, streak:6, level:7, xpToNext:2200, title:'Garden Guardian',
+    cls:'2A', school:'City Beach PS',
+  },
+];
+
+let activeProfile = profiles[0];
+
+// Store per-profile state snapshots
+const profileStates = {};
+profiles.forEach(p => {
+  profileStates[p.id] = {
+    riplets:p.riplets, xp:p.xp, streak:p.streak, level:p.level,
+    xpToNext:p.xpToNext, title:p.title,
+    todayLog:[], loggedToday:{}, redeemedRewards:{}, joinedClubs:{},
+    checklist: p.id==='rory' ? {0:true,1:true,2:false,3:false} : {0:false,1:false,2:false,3:false},
+    currChecklist:{},
+  };
+});
+// Init main state from Rory
+Object.assign(state, profileStates['rory']);
+
+function renderProfiles() {
+  document.getElementById('profile-list').innerHTML = profiles.map(p => `
+    <div class="profile-option ${p.id===activeProfile.id?'active-profile':''}" onclick="switchProfile('${p.id}')">
+      <div class="profile-avatar" style="background:${p.avatarBg}">${p.emoji}</div>
+      <div>
+        <div class="profile-name">${p.name} ${p.surname} <span style="font-size:8px; color:var(--text-light)">(${p.age})</span></div>
+        <div class="profile-detail">Lvl ${p.id===activeProfile.id ? state.level : profileStates[p.id].level} · ${p.id===activeProfile.id ? state.title : profileStates[p.id].title}</div>
+      </div>
+    </div>
+  `).join('');
+  // Update footer
+  document.getElementById('footer-avatar').textContent = activeProfile.emoji;
+  document.getElementById('footer-avatar').style.background = activeProfile.avatarBg;
+  document.getElementById('footer-name').textContent = `EcoHero ${activeProfile.name}`;
+  document.getElementById('footer-level').textContent = `Level ${state.level} · ${state.title}`;
+}
+
+function switchProfile(id) {
+  // Save current state
+  profileStates[activeProfile.id] = {
+    riplets:state.riplets, xp:state.xp, streak:state.streak, level:state.level,
+    xpToNext:state.xpToNext, title:state.title,
+    todayLog:[...state.todayLog], loggedToday:{...state.loggedToday},
+    redeemedRewards:{...state.redeemedRewards}, joinedClubs:{...state.joinedClubs},
+    checklist:{...state.checklist}, currChecklist:{...state.currChecklist},
+  };
+  // Load new profile
+  activeProfile = profiles.find(p => p.id === id);
+  const ps = profileStates[id];
+  state.riplets = ps.riplets;
+  state.xp = ps.xp;
+  state.streak = ps.streak;
+  state.level = ps.level;
+  state.xpToNext = ps.xpToNext;
+  state.title = ps.title;
+  state.todayLog = [...ps.todayLog];
+  state.loggedToday = {...ps.loggedToday};
+  state.redeemedRewards = {...ps.redeemedRewards};
+  state.joinedClubs = {...ps.joinedClubs};
+  state.checklist = {...ps.checklist};
+  state.currChecklist = ps.currChecklist ? {...ps.currChecklist} : {};
+
+  // Re-render everything
+  updateStats();
+  renderProfiles();
+  renderActivityCards();
+  renderTodayLog();
+  renderRecentActivity();
+  renderRewards();
+  renderClubs();
+  renderChecklist();
+  renderLeaderboard();
+  renderCurriculum();
+
+  showToast(activeProfile.emoji, `Switched to ${activeProfile.name}!`, 'club');
+  spawnConfetti(window.innerWidth/2, 200);
+}
+
+/* ═══════ ACTIVITIES DATA ═══════ */
+const activities = [
+  { id:'cup', emoji:'☕', name:'Skip single-use cup', riplets:15, xp:10 },
+  { id:'bag', emoji:'🛍️', name:'Bring reusable bag', riplets:25, xp:15 },
+  { id:'compost', emoji:'🥬', name:'Compost food scraps', riplets:30, xp:20 },
+  { id:'repair', emoji:'🔧', name:'Repair instead of replace', riplets:50, xp:35 },
+  { id:'bulk', emoji:'🧴', name:'Buy bulk / refill', riplets:40, xp:25 },
+  { id:'share', emoji:'🤝', name:'Share / donate item', riplets:35, xp:22 },
+];
+
+const realRewards = [
+  {id:'bottle', emoji:'🧴', name:'Bamboo Water Bottle', desc:'Eco-friendly hydration', cost:500},
+  {id:'voucher', emoji:'🏷️', name:'Eco Store Voucher', desc:'$10 store credit', cost:750},
+  {id:'tree', emoji:'🌳', name:'Tree Planting Credit', desc:'Plant a real tree!', cost:300},
+  {id:'wraps', emoji:'🍱', name:'Reusable Food Wraps', desc:'Beeswax wrap set', cost:400},
+  {id:'course', emoji:'📚', name:'Sustainability Course', desc:'Online learning access', cost:600},
+];
+const virtualRewards = [
+  {id:'avatar', emoji:'🎨', name:'Avatar: Ocean Explorer', desc:'Exclusive character skin', cost:150},
+  {id:'frame', emoji:'✨', name:'Animated Badge Frame', desc:'Sparkle effect for badges', cost:200},
+  {id:'garden', emoji:'🏡', name:'Garden Expansion', desc:'Unlock tropical zone', cost:350},
+  {id:'sounds', emoji:'🎵', name:'Nature Sounds Pack', desc:'Rainforest & ocean sounds', cost:100},
+];
+
+const clubs = [
+  {id:'zero', emoji:'🏆', name:'Zero Waste Champions', price:50, perk:'2x Riplets on weekends',
+   bg:'linear-gradient(135deg, var(--turq-wash), var(--turq-pale))', border:'var(--turq)'},
+  {id:'plastic', emoji:'🚫', name:'Plastic-Free Pioneers', price:75, perk:'Exclusive challenges + 15% store discount',
+   bg:'linear-gradient(135deg, var(--sky-pale), var(--plum-pale))', border:'var(--sky)'},
+  {id:'upcycle', emoji:'♻️', name:'Upcycling Masters', price:40, perk:'DIY tutorials + community marketplace',
+   bg:'linear-gradient(135deg, var(--leaf-pale), var(--sunny-pale))', border:'var(--leaf)'},
+];
+
+const checklistItems = [
+  'Material audit complete',
+  'Upcycling workshop attended',
+  'Create reuse artwork',
+  'Submit repair photo',
+];
+
+/* ═══════ UI UPDATE ═══════ */
+function updateStats() {
+  document.getElementById('stat-riplets').innerHTML = `💧 ${state.riplets.toLocaleString()} Riplets`;
+  document.getElementById('stat-xp').innerHTML = `⚡ ${state.xp.toLocaleString()} XP`;
+  document.getElementById('stat-streak').innerHTML = `🔥 ${state.streak} day streak`;
+  // Pulse animation
+  ['stat-riplets','stat-xp'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('pulse');
+    void el.offsetWidth;
+    el.classList.add('pulse');
+  });
+  // Rewards balance
+  const rb = document.getElementById('rewards-balance');
+  if (rb) rb.textContent = `💧 ${state.riplets.toLocaleString()}`;
+}
+
+/* ═══════ TOAST SYSTEM ═══════ */
+function showToast(emoji, text, type) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span class="toast-emoji">${emoji}</span><span>${text}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+
+/* ═══════ CONFETTI ═══════ */
+function spawnConfetti(x, y) {
+  const colors = ['#FFD93D','#40E0D0','#FF7F7F','#B388FF','#4CAF50','#64B5F6','#FF9800'];
+  for (let i = 0; i < 24; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (x + (Math.random()-0.5)*80) + 'px';
+    piece.style.top = (y + (Math.random()-0.5)*40) + 'px';
+    piece.style.background = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.transform = `rotate(${Math.random()*360}deg)`;
+    piece.style.animationDuration = (1.2 + Math.random()*1) + 's';
+    piece.style.width = (6 + Math.random()*8) + 'px';
+    piece.style.height = (6 + Math.random()*8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 2500);
+  }
+}
+
+/* ═══════ NAVIGATION ═══════ */
+const pageTitles = {
+  dashboard:['My Earth-Saving Journey',''],
+  activities:['Log an Eco Activity','Tap an action to earn Riplets and XP!'],
+  badges:['EcoHero Badges','Collect them all on your sustainability journey'],
+  rewards:['Rewards Shop','Spend your hard-earned Riplets on awesome stuff'],
+  bins:['Live Bin Status','Real-time sensor data from Think Lid sensors'],
+  leaderboard:['School Leaderboard','See how your school is doing together'],
+  champions:['Green Champions Program','Your 8-week sustainability adventure'],
+  clubs:['Riplet Clubs','Join a club for bonus perks and challenges'],
+  game:['Recycling Game','Sort waste into the right bins and earn Riplets!'],
+  curriculum:['Teacher\'s Curriculum','8-week waste & sustainability program — aligned to Australian Curriculum'],
+  global:['Global EcoChallenge','Schools around the world competing for the planet!'],
+  exchange:['School Exchange','Connect, share, and learn with partner schools worldwide'],
+};
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-' + id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const t = pageTitles[id] || ['',''];
+  document.getElementById('page-title').textContent = t[0];
+  document.getElementById('page-sub').textContent = id==='dashboard'
+    ? `Welcome back, ${activeProfile.name}! Your planet thanks you.`
+    : t[1];
+  // Re-render dynamic pages
+  if (id === 'rewards') updateStats();
+}
+
+/* ═══════ ACTIVITY LOGGING ═══════ */
+function logActivity(idx, el, evt) {
+  const act = activities[idx];
+  if (state.loggedToday[act.id]) return;
+  state.loggedToday[act.id] = true;
+  state.riplets += act.riplets;
+  state.xp += act.xp;
+  state.todayLog.unshift({ emoji:act.emoji, name:act.name, riplets:act.riplets, xp:act.xp, time:'Just now' });
+  // Mark card logged
+  el.classList.add('logged');
+  // Effects
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast('💧', `+${act.riplets} Riplets earned!`, 'riplet');
+  setTimeout(() => showToast('⚡', `+${act.xp} XP gained!`, 'xp'), 400);
+  updateStats();
+  renderTodayLog();
+  renderRecentActivity();
+}
+
+function renderActivityCards() {
+  document.getElementById('activity-cards').innerHTML = activities.map((a, i) => `
+    <div class="card activity-card ${state.loggedToday[a.id]?'logged':''}"
+         onclick="logActivity(${i}, this, event)">
+      <span style="font-size:40px; display:block; margin-bottom:8px">${a.emoji}</span>
+      <div style="font-size:13px; font-weight:700">${a.name}</div>
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:8px">
+        <span class="sticker" style="background:var(--sunny-pale); color:#B8860B; transform:rotate(-1deg)">💧 +${a.riplets}</span>
+        <span class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep); transform:rotate(1deg)">⚡ +${a.xp} XP</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTodayLog() {
+  const count = state.todayLog.length;
+  document.getElementById('today-log-count').textContent = `${count} activit${count===1?'y':'ies'} logged today`;
+  document.getElementById('today-log').innerHTML = count === 0
+    ? '<div style="text-align:center; padding:16px; color:var(--text-light); font-size:12px">No activities logged yet — tap a card above!</div>'
+    : state.todayLog.map(a => `
+      <div class="activity-item">
+        <div class="activity-emoji">${a.emoji}</div>
+        <div style="flex:1">
+          <div class="activity-text">${a.name}</div>
+          <div style="font-size:10px; color:var(--text-light)">${a.time}</div>
+        </div>
+        <div class="activity-pts">+${a.riplets} 💧 · +${a.xp} ⚡</div>
+      </div>
+    `).join('');
+}
+
+/* ═══════ RECENT ACTIVITY (Dashboard) ═══════ */
+function renderRecentActivity() {
+  const defaults = [
+    {emoji:'☕', name:'Skipped single-use cup at canteen', riplets:15, time:'10 min ago'},
+    {emoji:'🛍️', name:'Brought reusable bag from home', riplets:25, time:'2 hrs ago'},
+    {emoji:'🥬', name:'Composted lunch scraps in FOGO bin', riplets:30, time:'3 hrs ago'},
+    {emoji:'🤝', name:'Donated old textbooks to library', riplets:35, time:'Yesterday'},
+  ];
+  const all = [...state.todayLog.map(a => ({emoji:a.emoji, name:a.name, riplets:a.riplets, time:a.time})), ...defaults].slice(0, 5);
+  document.getElementById('recent-activity').innerHTML = all.map(a => `
+    <div class="activity-item">
+      <div class="activity-emoji">${a.emoji}</div>
+      <div style="flex:1">
+        <div class="activity-text">${a.name}</div>
+        <div style="font-size:10px; color:var(--text-light)">${a.time}</div>
+      </div>
+      <div class="activity-pts">+${a.riplets} 💧</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════ BADGES ═══════ */
+function renderBadges() {
+  const sets = [
+    { id:'waste-badges', badges:[
+      {icon:'♻️', name:'Rookie Recycler', pts:'100 pts', lvl:'Level 1', earned:true, desc:'Sort 10 items correctly'},
+      {icon:'⚔️', name:'Sorting Superstar', pts:'250 pts', lvl:'Level 2', earned:false, desc:'Sort 50 items with 90% accuracy'},
+      {icon:'🧙', name:'Waste Wizard', pts:'500 pts', lvl:'Level 3', earned:false, desc:'100 items sorted + help 3 friends'},
+    ]},
+    { id:'carbon-badges', badges:[
+      {icon:'🌱', name:'Carbon Rookie', pts:'150 pts', lvl:'Level 1', earned:true, desc:'Save 5kg CO₂'},
+      {icon:'🌿', name:'Carbon Warrior', pts:'300 pts', lvl:'Level 2', earned:false, desc:'Save 25kg CO₂ + start composting'},
+      {icon:'🏆', name:'Carbon Champion', pts:'1000 pts', lvl:'Level 3', earned:false, desc:'Save 100kg CO₂ + lead school project'},
+    ]},
+    { id:'tree-badges', badges:[
+      {icon:'🌱', name:'Seedling Protector', pts:'1 tree equiv', lvl:'Level 1', earned:true, desc:'Save equivalent of 1 tree'},
+      {icon:'🌲', name:'Forest Guardian', pts:'5 trees equiv', lvl:'Level 2', earned:false, desc:'Save equivalent of 5 trees'},
+      {icon:'🌴', name:'Rainforest Hero', pts:'20 trees equiv', lvl:'Level 3', earned:false, desc:'Save equivalent of 20 trees'},
+    ]},
+  ];
+  sets.forEach(s => {
+    document.getElementById(s.id).innerHTML = s.badges.map(b => `
+      <div class="badge-item ${b.earned?'earned':''}" onclick="clickBadge('${b.name}',${b.earned}, event)" style="cursor:pointer">
+        <span class="badge-icon">${b.icon}</span>
+        <div class="badge-name">${b.name}</div>
+        <div class="badge-pts">${b.pts}</div>
+        <div style="font-size:9px; color:var(--text-light); margin-top:2px">${b.lvl}${b.earned?' · ✓ Earned':''}</div>
+        <div style="font-size:9px; color:var(--aqua); margin-top:4px; font-weight:600">${b.desc}</div>
+      </div>
+    `).join('');
+  });
+}
+
+function clickBadge(name, earned, evt) {
+  if (earned) {
+    spawnConfetti(evt.clientX, evt.clientY);
+    showToast('🏆', `${name} — already earned! Nice work!`, 'badge');
+  } else {
+    showToast('🎯', `Keep going to unlock ${name}!`, 'xp');
+  }
+}
+
+/* ═══════ REWARDS ═══════ */
+function renderRewards() {
+  const renderList = (arr, id) => {
+    document.getElementById(id).innerHTML = arr.map(rw => {
+      const redeemed = state.redeemedRewards[rw.id];
+      const affordable = state.riplets >= rw.cost;
+      return `
+        <div class="reward-item" style="${redeemed?'opacity:0.5':''}">
+          <span class="reward-emoji">${rw.emoji}</span>
+          <div style="flex:1"><div class="reward-name">${rw.name}</div><div class="reward-desc">${rw.desc}</div></div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <div class="reward-cost">💧 ${rw.cost}</div>
+            <button class="reward-btn ${redeemed?'redeemed':''}"
+              onclick="redeemReward('${rw.id}', ${rw.cost}, '${rw.name}', '${rw.emoji}', event)"
+              ${redeemed || !affordable ? (redeemed?'':'title="Not enough Riplets"') : ''}>
+              ${redeemed ? '✓ Redeemed' : affordable ? 'Redeem' : 'Need more 💧'}
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  };
+  renderList(realRewards, 'real-rewards');
+  renderList(virtualRewards, 'virtual-rewards');
+}
+
+function redeemReward(id, cost, name, emoji, evt) {
+  if (state.redeemedRewards[id]) return;
+  if (state.riplets < cost) {
+    showToast('😢', `Not enough Riplets for ${name}!`, 'error');
+    return;
+  }
+  state.riplets -= cost;
+  state.redeemedRewards[id] = true;
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast(emoji, `${name} redeemed! 🎉`, 'reward');
+  updateStats();
+  renderRewards();
+}
+
+/* ═══════ CLUBS ═══════ */
+function renderClubs() {
+  document.getElementById('clubs-grid').innerHTML = clubs.map(c => {
+    const joined = state.joinedClubs[c.id];
+    return `
+    <div class="card club-card" style="background:${c.bg}; border-color:${c.border}">
+      <span class="club-emoji">${c.emoji}</span>
+      <div class="club-name" style="color:var(--aqua-deep)">${c.name}</div>
+      <div class="club-price" style="color:var(--text)">${c.price} Riplets/month</div>
+      <div class="club-perk">${c.perk}</div>
+      <button class="club-join ${joined?'joined':''}" style="border-color:${c.border}; ${joined?'':'color:'+c.border}"
+        onclick="joinClub('${c.id}', ${c.price}, '${c.name}', '${c.emoji}', event)">
+        ${joined ? '✓ Joined!' : 'Join Club'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function joinClub(id, price, name, emoji, evt) {
+  if (state.joinedClubs[id]) return;
+  if (state.riplets < price) {
+    showToast('😢', `Need ${price} Riplets to join ${name}!`, 'error');
+    return;
+  }
+  state.riplets -= price;
+  state.joinedClubs[id] = true;
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast(emoji, `Welcome to ${name}! 🎉`, 'club');
+  updateStats();
+  renderClubs();
+}
+
+/* ═══════ BINS ═══════ */
+function renderBins() {
+  const bins=[
+    {name:'Main Hall – Landfill', emoji:'🗑️', fill:78, color:'#6B6B6B', bg:'#E0E0E0', loc:'Building A'},
+    {name:'Canteen – Recycling', emoji:'♻️', fill:45, color:'#5B7FA5', bg:'#D6E4EF', loc:'Building B'},
+    {name:'Science Block – FOGO', emoji:'🥬', fill:62, color:'#7BAF6E', bg:'#D5EACF', loc:'Building C'},
+    {name:'Library – Paper', emoji:'📄', fill:31, color:'#D4956A', bg:'#F5E3D2', loc:'Building A'},
+    {name:'Sports Hall – Landfill', emoji:'🗑️', fill:89, color:'#C4736B', bg:'#F0D5D2', loc:'Building D'},
+    {name:'Admin – Recycling', emoji:'♻️', fill:22, color:'#5B7FA5', bg:'#D6E4EF', loc:'Building A'},
+  ];
+  document.getElementById('bin-cards').innerHTML = bins.map(b => {
+    const fc = b.fill>=80?'var(--coral)':b.fill>=60?'var(--sunny)':'var(--aqua)';
+    const stat = b.fill>=80?'Almost Full!':b.fill>=60?'Getting There':'Looking Good';
+    return `
+    <div class="card bin-card">
+      <div class="bin-visual" style="background:${b.bg}">
+        <div class="bin-fill" style="height:${b.fill}%; background:${b.color}; opacity:0.7"></div>
+        <div class="bin-label">${b.emoji}</div>
+      </div>
+      <div class="bin-info">
+        <div class="bin-name">${b.name}</div>
+        <div class="bin-loc">${b.loc}</div>
+        <div style="margin-top:4px">
+          <span class="sticker" style="background:${b.fill>=80?'var(--coral-pale)':b.fill>=60?'var(--sunny-pale)':'var(--turq-wash)'}; color:${fc}; font-size:9px; transform:rotate(-1deg)">${stat}</span>
+        </div>
+      </div>
+      <div class="bin-pct" style="color:${fc}">${b.fill}%</div>
+    </div>`;
+  }).join('');
+}
+
+/* ═══════ LEADERBOARD ═══════ */
+function renderLeaderboard() {
+  const roryXP = activeProfile.id==='rory' ? state.xp : profileStates['rory'].xp;
+  const kellyXP = activeProfile.id==='kelly' ? state.xp : profileStates['kelly'].xp;
+  const students=[
+    {name:'Rory L.', cls:'5B', score:roryXP, pid:'rory'},
+    {name:'Liam K.', cls:'5A', score:3420, pid:''},
+    {name:'Anika R.', cls:'6C', score:3210, pid:''},
+    {name:'Noah W.', cls:'4B', score:2980, pid:''},
+    {name:'Zara M.', cls:'5B', score:2870, pid:''},
+    {name:'Ethan J.', cls:'6A', score:2650, pid:''},
+    {name:'Kelly L.', cls:'2A', score:kellyXP, pid:'kelly'},
+  ].sort((a,b) => b.score - a.score);
+  const classes=[
+    {name:'Class 5B', score:18400 + (state.xp - 3680)},
+    {name:'Class 6C', score:17200},
+    {name:'Class 5A', score:16800},
+    {name:'Class 4B', score:15100},
+    {name:'Class 6A', score:14600},
+  ].sort((a,b) => b.score - a.score);
+  const rk = i => i===0?'lb-rank-1':i===1?'lb-rank-2':i===2?'lb-rank-3':'lb-rank-n';
+  document.getElementById('student-lb').innerHTML = students.map((s,i) => {
+    const isActive = s.pid === activeProfile.id;
+    const isOurs = s.pid === 'mia' || s.pid === 'rory' || s.pid === 'kelly';
+    return `
+    <div class="lb-row" ${isActive?'style="background:var(--turq-wash); border-radius:10px; padding:10px; margin:-4px -6px"':''}>
+      <div class="lb-rank ${rk(i)}">${i+1}</div>
+      <div style="flex:1"><div class="lb-name">${s.name} ${isActive?'⭐':isOurs?'🌊':''}</div><div class="lb-class">${s.cls}</div></div>
+      <div class="lb-score">${s.score.toLocaleString()} XP</div>
+    </div>`;
+  }).join('');
+  document.getElementById('class-lb').innerHTML = classes.map((c,i) => `
+    <div class="lb-row">
+      <div class="lb-rank ${rk(i)}">${i+1}</div>
+      <div class="lb-name" style="flex:1">${c.name}</div>
+      <div class="lb-score">${c.score.toLocaleString()} XP</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════ TIMELINE ═══════ */
+function renderTimeline() {
+  const weeks=[
+    {n:1, title:'Green Beginnings', desc:'Introduction + sensor setup + baseline audit', status:'done'},
+    {n:2, title:'Waste Warriors', desc:'Understanding waste types + data analysis', status:'done'},
+    {n:3, title:'Reduce & Refuse', desc:'Waste reduction strategies', status:'done'},
+    {n:4, title:'Reuse & Repair', desc:'Creative reuse techniques', status:'current'},
+    {n:5, title:'Recycling Heroes', desc:'Proper recycling processes', status:'upcoming'},
+    {n:6, title:'Energy & Water Champions', desc:'Resource conservation', status:'upcoming'},
+    {n:7, title:'Community Connectors', desc:'Spreading sustainability messages', status:'upcoming'},
+    {n:8, title:'Sustainability Showcase', desc:'Celebrating achievements!', status:'upcoming'},
+  ];
+  const tagStyle = s => s==='done'?'background:var(--leaf-pale); color:var(--leaf)':s==='current'?'background:var(--sunny-pale); color:#B8860B':'background:var(--craft); color:var(--text-light)';
+  const tagText = s => s==='done'?'✓ Complete':s==='current'?'● In Progress':'Upcoming';
+  document.getElementById('timeline').innerHTML = weeks.map((w,i) => `
+    <div class="week-item">
+      <div style="position:relative">
+        <div class="week-dot ${w.status}">${w.n}</div>
+        ${i<weeks.length-1?'<div class="week-line"></div>':''}
+      </div>
+      <div class="week-content">
+        <div class="week-title">Week ${w.n}: ${w.title}</div>
+        <div class="week-desc">${w.desc}</div>
+        <span class="week-tag" style="${tagStyle(w.status)}">${tagText(w.status)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════ CHECKLIST ═══════ */
+function renderChecklist() {
+  document.getElementById('week-checklist').innerHTML = checklistItems.map((item, i) => {
+    const done = state.checklist[i];
+    return `
+      <div class="check-interactive" onclick="toggleCheck(${i}, event)"
+        style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; ${done?'':'color:var(--text-light)'}">
+        <span style="width:18px; height:18px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0;
+          background:${done?'var(--leaf-pale)':'#F0EBE3'}; color:${done?'var(--leaf)':'var(--oak)'}">
+          ${done ? '✓' : '○'}
+        </span>
+        ${item}
+      </div>`;
+  }).join('');
+}
+
+function toggleCheck(idx, evt) {
+  if (state.checklist[idx]) return; // can't uncheck
+  state.checklist[idx] = true;
+  state.riplets += 20;
+  state.xp += 15;
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast('✅', `Task complete! +20 💧 +15 XP`, 'reward');
+  updateStats();
+  renderChecklist();
+  // Check if all done
+  if (Object.values(state.checklist).every(v => v)) {
+    setTimeout(() => showToast('🌟', 'Week 4 complete! Amazing work!', 'badge'), 600);
+  }
+}
+
+/* ═══════ GLOBAL CHALLENGE ═══════ */
+const countries = [
+  {code:'SE', flag:'🇸🇪', name:'Sweden', pts:185840, co2:3120, schools:22, students:3800, color:'#2196F3', motto:'Lagom – just the right amount'},
+  {code:'AU', flag:'🇦🇺', name:'Australia', pts:184600, co2:2840, schools:18, students:3200, color:'#FFD93D', motto:'Fair dinkum green!'},
+  {code:'JP', flag:'🇯🇵', name:'Japan', pts:178200, co2:2960, schools:24, students:4100, color:'#F44336', motto:'Mottainai – waste nothing'},
+  {code:'CA', flag:'🇨🇦', name:'Canada', pts:172400, co2:2680, schools:20, students:3400, color:'#E91E63', motto:'True North, strong and green'},
+  {code:'UK', flag:'🇬🇧', name:'United Kingdom', pts:168900, co2:2520, schools:19, students:3100, color:'#3F51B5', motto:'Keep calm and recycle on'},
+  {code:'US', flag:'🇺🇸', name:'United States', pts:165200, co2:2380, schools:22, students:3600, color:'#1976D2', motto:'One nation, under sustainability'},
+  {code:'IN', flag:'🇮🇳', name:'India', pts:158600, co2:2200, schools:16, students:2800, color:'#FF9800', motto:'Vasudhaiva Kutumbakam – the world is family'},
+  {code:'NZ', flag:'🇳🇿', name:'New Zealand', pts:142800, co2:1980, schools:8, students:1400, color:'#009688', motto:'Kaitiakitanga – guardianship of earth'},
+  {code:'IE', flag:'🇮🇪', name:'Ireland', pts:138400, co2:1860, schools:7, students:1200, color:'#4CAF50', motto:'Ní neart go cur le chéile – strength in unity'},
+];
+
+const partnerSchools = [
+  {flag:'🇸🇪', school:'Grönaskolan', city:'Stockholm', country:'Sweden', pts:12400, connected:true, color:'#2196F3'},
+  {flag:'🇺🇸', school:'Green Valley Elementary', city:'Portland, OR', country:'USA', pts:10800, connected:true, color:'#1976D2'},
+  {flag:'🇨🇦', school:'Maple Leaf Academy', city:'Vancouver', country:'Canada', pts:11200, connected:true, color:'#E91E63'},
+  {flag:'🇯🇵', school:'Midori Gakuen', city:'Kyoto', country:'Japan', pts:13100, connected:true, color:'#F44336'},
+  {flag:'🇮🇳', school:'Green Shoots Intl.', city:'Bangalore', country:'India', pts:9600, connected:false, color:'#FF9800'},
+  {flag:'🇬🇧', school:'Oakwood Primary', city:'Bristol', country:'UK', pts:11800, connected:true, color:'#3F51B5'},
+  {flag:'🇮🇪', school:'Scoil Glas', city:'Cork', country:'Ireland', pts:8900, connected:false, color:'#4CAF50'},
+  {flag:'🇳🇿', school:'Kowhai Primary', city:'Wellington', country:'NZ', pts:9200, connected:true, color:'#009688'},
+];
+
+const countryChallenges = [
+  {id:'au-se', left:{flag:'🇦🇺',name:'Australia'}, right:{flag:'🇸🇪',name:'Sweden'},
+   challenge:'Most recycling logged this week', leftPct:46, rightPct:54, rightColor:'#2196F3',
+   reward:'500 Riplets for winning country', daysLeft:4, status:'losing'},
+  {id:'au-jp', left:{flag:'🇦🇺',name:'Australia'}, right:{flag:'🇯🇵',name:'Japan'},
+   challenge:'Lowest food waste per student', leftPct:58, rightPct:42, rightColor:'#F44336',
+   reward:'Badge: Cross-Pacific Champion', daysLeft:6, status:'winning'},
+  {id:'au-uk', left:{flag:'🇦🇺',name:'Australia'}, right:{flag:'🇬🇧',name:'UK'},
+   challenge:'Most trees-equivalent saved', leftPct:51, rightPct:49, rightColor:'#3F51B5',
+   reward:'300 Riplets + exclusive badge', daysLeft:2, status:'winning'},
+];
+
+const schoolMatchups = [
+  {partner:{flag:'🇯🇵', school:'Midori Gakuen', city:'Kyoto'}, challenge:'Sort 500 items correctly',
+   you:342, them:388, total:500, reward:'+80 Riplets', emoji:'♻️'},
+  {partner:{flag:'🇸🇪', school:'Grönaskolan', city:'Stockholm'}, challenge:'Compost 50kg this week',
+   you:28, them:31, total:50, reward:'+60 Riplets', emoji:'🥬'},
+  {partner:{flag:'🇬🇧', school:'Oakwood Primary', city:'Bristol'}, challenge:'Log 200 eco-activities',
+   you:124, them:98, total:200, reward:'+100 Riplets', emoji:'📝'},
+];
+
+const exchangeMessages = [
+  {flag:'🇯🇵', school:'Midori Gakuen', name:'Yuki', msg:'We use furoshiki cloth wraps instead of gift paper! Try it!', time:'2h ago', emoji:'🎁'},
+  {flag:'🇸🇪', school:'Grönaskolan', name:'Erik', msg:'Our school composts 98% of lunch waste. Happy to share our system!', time:'5h ago', emoji:'🌱'},
+  {flag:'🇳🇿', school:'Kowhai Primary', name:'Aroha', msg:'We did a beach cleanup last week — 200kg of rubbish collected!', time:'1d ago', emoji:'🏖️'},
+  {flag:'🇬🇧', school:'Oakwood Primary', name:'Oliver', msg:'Started a repair café at school. Students fix toys and clothes!', time:'1d ago', emoji:'🔧'},
+  {flag:'🇨🇦', school:'Maple Leaf Academy', name:'Sophia', msg:'We made our playground equipment from recycled plastics!', time:'2d ago', emoji:'🎠'},
+  {flag:'🇮🇪', school:'Scoil Glas', name:'Aoife', msg:'Our school bog garden helps filter rainwater naturally. So cool!', time:'3d ago', emoji:'🌿'},
+];
+
+const ecoQuests = [
+  {flag:'🇯🇵', country:'Japan', quest:'Mottainai Week', desc:'Go 5 days wasting nothing — inspired by Japanese philosophy', riplets:75, xp:50, done:false},
+  {flag:'🇸🇪', country:'Sweden', quest:'Swedish Fika Challenge', desc:'Use only reusable cups for a week of school snack breaks', riplets:50, xp:35, done:true},
+  {flag:'🇮🇳', country:'India', quest:'Jugaad Innovation', desc:'Upcycle 3 waste items into something useful (Indian ingenuity!)', riplets:80, xp:55, done:false},
+  {flag:'🇳🇿', country:'NZ', quest:'Kaitiaki Guardian', desc:'Adopt a school garden patch for a month (Māori earth care)', riplets:100, xp:70, done:false},
+  {flag:'🇮🇪', country:'Ireland', quest:'Bog to Table', desc:'Grow herbs from compost & cook a meal (Irish farm tradition)', riplets:60, xp:40, done:false},
+  {flag:'🇬🇧', country:'UK', quest:'Repair Café Host', desc:'Run a repair session — fix 5 broken items at school', riplets:90, xp:60, done:false},
+  {flag:'🇺🇸', country:'USA', quest:'Earth Day Every Day', desc:'Complete 1 eco-action daily for 2 weeks straight', riplets:70, xp:45, done:true},
+  {flag:'🇨🇦', country:'Canada', quest:'Maple Trail Walk', desc:'Map local nature trails & do a litter-free hike', riplets:55, xp:38, done:false},
+];
+
+const globalBadges = [
+  {icon:'🌏', name:'World Connector', desc:'Connect with 3 partner schools', earned:true},
+  {icon:'🗺️', name:'Globe Trotter', desc:'Complete quests from 4 countries', earned:false},
+  {icon:'🤝', name:'Friendship Bridge', desc:'Exchange 10 messages with partners', earned:true},
+  {icon:'⚔️', name:'Challenge Champion', desc:'Win 5 school matchups', earned:false},
+  {icon:'🏆', name:'Nation Builder', desc:'Contribute 1000+ pts to Australia', earned:true},
+  {icon:'🌍', name:'Planet Protector', desc:'Help reach a global collaborative goal', earned:false},
+  {icon:'📚', name:'Culture Explorer', desc:'Complete 6 Cultural Eco-Quests', earned:false},
+  {icon:'⭐', name:'Global Superstar', desc:'Top 10 student worldwide', earned:false},
+];
+
+function renderCountryLeaderboard() {
+  const sorted = [...countries].sort((a,b) => b.pts - a.pts);
+  const maxPts = sorted[0].pts;
+  const rk = i => i===0?'lb-rank-1':i===1?'lb-rank-2':i===2?'lb-rank-3':'lb-rank-n';
+  document.getElementById('country-lb').innerHTML = sorted.map((c, i) => `
+    <div class="country-row ${c.code==='AU'?'highlight':''}">
+      <div class="country-rank ${rk(i)}">${i+1}</div>
+      <div class="country-flag">${c.flag}</div>
+      <div style="flex:1; min-width:0">
+        <div style="font-size:12px; font-weight:700">${c.name} ${c.code==='AU'?'⭐':''}</div>
+        <div style="font-size:9px; color:var(--text-light)">${c.schools} schools · ${c.students.toLocaleString()} students</div>
+        <div class="country-bar-track">
+          <div class="country-bar-fill" style="width:${(c.pts/maxPts)*100}%; background:${c.color}"></div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Caveat',cursive; font-size:18px; font-weight:700; color:var(--aqua-deep)">${c.pts.toLocaleString()}</div>
+        <div style="font-size:9px; color:var(--leaf); font-weight:600">${c.co2.toLocaleString()} kg CO₂</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCountryChallenges() {
+  document.getElementById('country-challenges').innerHTML = countryChallenges.map(ch => `
+    <div class="challenge-card" onclick="boostChallenge('${ch.id}', event)">
+      <div style="text-align:center; flex-shrink:0">
+        <div style="font-size:28px">${ch.left.flag}</div>
+        <div style="font-size:9px; font-weight:700">${ch.left.name}</div>
+      </div>
+      <div class="challenge-progress">
+        <div style="font-size:11px; font-weight:700; margin-bottom:4px">${ch.challenge}</div>
+        <div class="challenge-bar">
+          <div class="challenge-bar-left" style="width:${ch.leftPct}%"></div>
+          <div class="challenge-bar-right" style="width:${ch.rightPct}%; background:${ch.rightColor}"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; margin-top:3px">
+          <span style="color:#B8860B">${ch.leftPct}%</span>
+          <span style="font-size:8px; color:var(--text-light)">🎁 ${ch.reward} · ${ch.daysLeft}d left</span>
+          <span style="color:${ch.rightColor}">${ch.rightPct}%</span>
+        </div>
+      </div>
+      <div class="challenge-vs">VS</div>
+      <div style="text-align:center; flex-shrink:0">
+        <div style="font-size:28px">${ch.right.flag}</div>
+        <div style="font-size:9px; font-weight:700">${ch.right.name}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function boostChallenge(id, evt) {
+  const ch = countryChallenges.find(c => c.id === id);
+  if (!ch) return;
+  if (ch.leftPct >= 100) return;
+  ch.leftPct = Math.min(ch.leftPct + 2, 100);
+  ch.rightPct = Math.max(ch.rightPct - 2, 0);
+  state.riplets += 5;
+  state.xp += 3;
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast('🇦🇺', '+5 💧 Boosted Australia!', 'riplet');
+  updateStats();
+  renderCountryChallenges();
+}
+
+function renderCollabBars() {
+  const contribs = [
+    {flag:'🇸🇪', name:'Sweden', trees:1180, color:'#2196F3'},
+    {flag:'🇦🇺', name:'Australia', trees:1040, color:'#FFD93D'},
+    {flag:'🇯🇵', name:'Japan', trees:1120, color:'#F44336'},
+    {flag:'🇨🇦', name:'Canada', trees:890, color:'#E91E63'},
+    {flag:'🇬🇧', name:'UK', trees:820, color:'#3F51B5'},
+    {flag:'🇺🇸', name:'USA', trees:940, color:'#1976D2'},
+    {flag:'🇮🇳', name:'India', trees:760, color:'#FF9800'},
+    {flag:'🇳🇿', name:'NZ', trees:340, color:'#009688'},
+    {flag:'🇮🇪', name:'Ireland', trees:250, color:'#4CAF50'},
+  ].sort((a,b) => b.trees - a.trees);
+  const max = contribs[0].trees;
+  document.getElementById('collab-country-bars').innerHTML = `
+    <div style="display:grid; grid-template-columns:repeat(${contribs.length}, 1fr); gap:4px; align-items:end; height:80px; margin-top:8px">
+      ${contribs.map(c => `
+        <div style="display:flex; flex-direction:column; align-items:center; height:100%">
+          <div style="flex:1; width:100%; display:flex; align-items:flex-end">
+            <div style="width:100%; height:${(c.trees/max)*100}%; background:${c.color}; border-radius:6px 6px 0 0; opacity:0.8; min-height:4px"></div>
+          </div>
+          <div style="font-size:14px; margin-top:2px">${c.flag}</div>
+          <div style="font-size:8px; font-weight:700; color:var(--text-light)">${c.trees}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderGlobalSchoolLB() {
+  const schools = [
+    {flag:'🇯🇵', name:'Midori Gakuen', city:'Kyoto', pts:13100},
+    {flag:'🇸🇪', name:'Grönaskolan', city:'Stockholm', pts:12400},
+    {flag:'🇬🇧', name:'Oakwood Primary', city:'Bristol', pts:11800},
+    {flag:'🇦🇺', name:'City Beach PS', city:'Perth', pts:11500 + Math.floor(state.xp * 0.1)},
+    {flag:'🇨🇦', name:'Maple Leaf Academy', city:'Vancouver', pts:11200},
+    {flag:'🇺🇸', name:'Green Valley Elem.', city:'Portland', pts:10800},
+    {flag:'🇮🇳', name:'Green Shoots Intl.', city:'Bangalore', pts:9600},
+    {flag:'🇳🇿', name:'Kowhai Primary', city:'Wellington', pts:9200},
+    {flag:'🇮🇪', name:'Scoil Glas', city:'Cork', pts:8900},
+    {flag:'🇦🇺', name:'Sunrise Academy', city:'Sydney', pts:8600},
+  ].sort((a,b) => b.pts - a.pts);
+  const rk = i => i===0?'lb-rank-1':i===1?'lb-rank-2':i===2?'lb-rank-3':'lb-rank-n';
+  document.getElementById('global-school-lb').innerHTML = schools.map((s, i) => `
+    <div class="lb-row" ${s.name==='City Beach PS'?'style="background:var(--sunny-pale); border-radius:10px; padding:10px; margin:-2px -4px"':''}>
+      <div class="lb-rank ${rk(i)}">${i+1}</div>
+      <div style="font-size:20px; flex-shrink:0">${s.flag}</div>
+      <div style="flex:1">
+        <div class="lb-name">${s.name} ${s.name==='City Beach PS'?'⭐ (Your school)':''}</div>
+        <div class="lb-class">${s.city}</div>
+      </div>
+      <div class="lb-score">${s.pts.toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+/* ── School Exchange Renderers ── */
+function renderPartnerMap() {
+  document.getElementById('partner-map').innerHTML = partnerSchools.map(p => `
+    <div class="partner-card ${p.connected?'connected':''}" onclick="clickPartner('${p.school}', ${p.connected}, event)">
+      <span class="partner-flag">${p.flag}</span>
+      <div class="partner-school">${p.school}</div>
+      <div class="partner-country">${p.city}, ${p.country}</div>
+      <div style="font-family:'Caveat',cursive; font-size:16px; font-weight:700; color:${p.color}; margin-top:4px">${p.pts.toLocaleString()} pts</div>
+      ${!p.connected ? '<button class="club-join" style="border-color:var(--turq); color:var(--turq); margin-top:6px; font-size:10px; padding:4px 12px" onclick="event.stopPropagation(); connectPartner(this, \''+p.school+'\', event)">Connect</button>' : ''}
+    </div>
+  `).join('');
+}
+
+function clickPartner(school, connected, evt) {
+  if (connected) {
+    showToast('🤝', `Connected with ${school}!`, 'club');
+  } else {
+    showToast('💌', `Send a connection request to ${school}!`, 'xp');
+  }
+}
+
+function connectPartner(btn, school, evt) {
+  const p = partnerSchools.find(s => s.school === school);
+  if (p) {
+    p.connected = true;
+    state.riplets += 25;
+    state.xp += 20;
+    spawnConfetti(evt.clientX, evt.clientY);
+    showToast('🌏', `Connected with ${school}! +25 💧`, 'reward');
+    updateStats();
+    renderPartnerMap();
+  }
+}
+
+function renderSchoolMatchups() {
+  document.getElementById('school-matchups').innerHTML = schoolMatchups.map((m, i) => {
+    const youPct = Math.round((m.you/m.total)*100);
+    const themPct = Math.round((m.them/m.total)*100);
+    const winning = m.you >= m.them;
+    return `
+    <div class="matchup-card">
+      <div style="text-align:center; flex-shrink:0">
+        <div style="font-size:28px">${m.partner.flag}</div>
+        <div style="font-size:9px; font-weight:700">${m.partner.school}</div>
+        <div style="font-size:8px; color:var(--text-light)">${m.partner.city}</div>
+      </div>
+      <div style="flex:1; min-width:0">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px">
+          <span style="font-size:18px">${m.emoji}</span>
+          <div>
+            <div style="font-size:11px; font-weight:700">${m.challenge}</div>
+            <div style="font-size:9px; color:var(--text-light)">🎁 ${m.reward}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center">
+          <div style="flex:1">
+            <div style="display:flex; justify-content:space-between; font-size:9px; font-weight:700; margin-bottom:2px">
+              <span style="color:${winning?'var(--leaf)':'var(--coral)'}">You: ${m.you}</span>
+              <span>Them: ${m.them}</span>
+            </div>
+            <div style="height:8px; background:var(--turq-wash); border-radius:6px; overflow:hidden; display:flex">
+              <div style="width:${youPct}%; background:${winning?'var(--leaf)':'var(--coral)'}; border-radius:4px 0 0 4px; transition:width .4s"></div>
+              <div style="width:${themPct}%; background:var(--sky); border-radius:0 4px 4px 0; transition:width .4s"></div>
+            </div>
+          </div>
+          <div class="sticker" style="background:${winning?'var(--leaf-pale)':'var(--coral-pale)'}; color:${winning?'var(--leaf)':'var(--coral)'}; font-size:9px; transform:rotate(2deg)">
+            ${winning ? '🏆 Winning' : '💪 Push harder!'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderExchangeWall() {
+  document.getElementById('exchange-wall').innerHTML = exchangeMessages.map(m => `
+    <div class="exchange-msg">
+      <div style="flex-shrink:0; text-align:center">
+        <div style="font-size:22px">${m.flag}</div>
+        <div style="font-size:8px; font-weight:700; color:var(--text-light)">${m.time}</div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:11px; font-weight:700">${m.name} <span style="font-weight:600; color:var(--text-light)">from ${m.school}</span></div>
+        <div style="font-size:12px; margin-top:2px; color:var(--text); line-height:1.4">${m.emoji} ${m.msg}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderEcoQuests() {
+  document.getElementById('eco-quests').innerHTML = ecoQuests.map((q, i) => `
+    <div class="quest-item ${q.done?'quest-done':''}" onclick="completeQuest(${i}, event)">
+      <div style="display:flex; align-items:center; gap:8px">
+        <span style="font-size:22px">${q.flag}</span>
+        <div style="flex:1">
+          <div style="font-size:12px; font-weight:700">${q.quest}</div>
+          <div style="font-size:10px; color:var(--text-light)">${q.country} · ${q.desc}</div>
+        </div>
+        <div style="text-align:right; flex-shrink:0">
+          <div style="font-size:10px; font-weight:800; color:#B8860B">+${q.riplets} 💧</div>
+          <div style="font-size:9px; font-weight:700; color:var(--aqua)">+${q.xp} XP</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function completeQuest(idx, evt) {
+  const q = ecoQuests[idx];
+  if (q.done) return;
+  q.done = true;
+  state.riplets += q.riplets;
+  state.xp += q.xp;
+  spawnConfetti(evt.clientX, evt.clientY);
+  showToast(q.flag, `${q.quest} complete! +${q.riplets} 💧`, 'reward');
+  setTimeout(() => showToast('⚡', `+${q.xp} XP from ${q.country}!`, 'xp'), 500);
+  updateStats();
+  renderEcoQuests();
+}
+
+function renderGlobalBadges() {
+  document.getElementById('global-badges').innerHTML = globalBadges.map(b => `
+    <div class="badge-item ${b.earned?'earned':''}" onclick="clickBadge('${b.name}',${b.earned}, event)" style="cursor:pointer">
+      <span class="badge-icon">${b.icon}</span>
+      <div class="badge-name">${b.name}</div>
+      <div style="font-size:9px; color:var(--text-light); margin-top:2px">${b.desc}</div>
+      <div style="font-size:9px; color:${b.earned?'var(--leaf)':'var(--aqua)'}; margin-top:4px; font-weight:700">${b.earned?'✓ Earned':'In Progress'}</div>
+    </div>
+  `).join('');
+}
+
+/* ═══════ TEACHER'S CURRICULUM ═══════ */
+const curriculumWeeks = [
+  {
+    n:1, title:'What is Waste?', theme:'Understanding waste streams, types, and where our rubbish goes',
+    status:'done', phase:'Explore',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'HASS', bg:'#FFF3E0', color:'#E65100'},
+      {label:'English', bg:'#FFFDE7', color:'#F57F17'},
+    ],
+    acara:['ACSSU044 – Natural & processed materials','ACHASSK088 – Use of environments','ACELY1692 – Informative texts'],
+    lessons:[
+      {
+        title:'Lesson 1: Where Does It All Go?',
+        duration:'60 min',
+        objective:'Students identify waste streams (landfill, recycling, compost, e-waste) and trace the journey of household rubbish.',
+        activities:[
+          {icon:'📊', text:'Class waste audit — students weigh and sort one day\'s classroom waste into 4 bins'},
+          {icon:'🗺️', text:'Mapping activity — trace waste from bin to landfill/recycling plant on a local area map'},
+          {icon:'📝', text:'Record findings in SmartLoop science journal'},
+        ],
+        smartloop:'Students log their first "Waste Audit" activity in SmartLoop and earn their first Riplets',
+        assessment:'Worksheet: classify 15 everyday items into correct waste streams',
+      },
+      {
+        title:'Lesson 2: The Waste Problem',
+        duration:'50 min',
+        objective:'Explore the environmental impact of waste — landfill overflow, ocean plastic, methane emissions.',
+        activities:[
+          {icon:'🎬', text:'Watch "The Story of Stuff" (abridged 10 min) — class discussion'},
+          {icon:'🔬', text:'Decomposition experiment setup — bury 6 items (banana, newspaper, plastic, aluminium, glass, styrofoam) in school garden'},
+          {icon:'✏️', text:'Write a persuasive paragraph: "Why waste matters to me"'},
+        ],
+        smartloop:'Introduce SmartLoop dashboard — students explore their EcoHero profile and eco-impact stats',
+        assessment:'Exit ticket: 3 facts about waste impact + 1 personal goal',
+      },
+    ],
+    checklist:['Waste audit materials sorted','Decomposition experiment set up','SmartLoop accounts activated','Parent info letter sent'],
+  },
+  {
+    n:2, title:'Reduce & Refuse', theme:'The first R — reducing consumption and refusing single-use items',
+    status:'done', phase:'Explore',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'Mathematics', bg:'#E8F5E9', color:'#2E7D32'},
+      {label:'HASS', bg:'#FFF3E0', color:'#E65100'},
+    ],
+    acara:['ACSSU075 – Changes to materials','ACMNA076 – Data collection & display','ACHASSK089 – Resources & sustainability'],
+    lessons:[
+      {
+        title:'Lesson 1: The Power of Less',
+        duration:'55 min',
+        objective:'Calculate personal waste footprint and set reduction targets using real data.',
+        activities:[
+          {icon:'📏', text:'Waste footprint calculator — students estimate their weekly waste in kilograms'},
+          {icon:'📊', text:'Graphing activity — create bar charts comparing waste generation by category'},
+          {icon:'🎯', text:'Set 3 personal "Reduce" targets and enter into SmartLoop'},
+        ],
+        smartloop:'Log "Skip single-use cup" and "Bring reusable bag" activities — track daily progress',
+        assessment:'Data display: annotated bar chart with reduction targets highlighted',
+      },
+      {
+        title:'Lesson 2: Refuse Challenge Week',
+        duration:'50 min + week-long challenge',
+        objective:'Identify single-use items that can be refused and design alternatives.',
+        activities:[
+          {icon:'🚫', text:'Single-use scavenger hunt — photograph every single-use item found at school in 20 minutes'},
+          {icon:'💡', text:'Design challenge: create a reusable alternative to one single-use item'},
+          {icon:'🏆', text:'Launch week-long "Refuse Challenge" — earn bonus Riplets for each day without single-use plastics'},
+        ],
+        smartloop:'Students use SmartLoop\'s daily logging to track refuse streak — highest streaks win bonus Riplets',
+        assessment:'Photo journal documenting 5 refused items + alternatives used',
+      },
+    ],
+    checklist:['Waste footprint calculators complete','Bar charts displayed','Refuse Challenge launched','Week 1 decomposition check done'],
+  },
+  {
+    n:3, title:'Reuse & Repair', theme:'Creative reuse, upcycling projects, and the repair economy',
+    status:'done', phase:'Engage',
+    strands:[
+      {label:'Technologies', bg:'#F3E5F5', color:'#6A1B9A'},
+      {label:'The Arts', bg:'#FCE4EC', color:'#C62828'},
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+    ],
+    acara:['ACTDEP015 – Design for sustainability','ACAVAM111 – Visual art materials & techniques','ACSHE061 – Science & technology contributions'],
+    lessons:[
+      {
+        title:'Lesson 1: Upcycling Workshop',
+        duration:'70 min (double period)',
+        objective:'Transform waste materials into functional or artistic products through guided upcycling.',
+        activities:[
+          {icon:'🔧', text:'Repair station rotation — 3 stations: fabric repair, toy fix-it, book binding'},
+          {icon:'🎨', text:'Upcycle art project — turn collected waste into a class sculpture or mural'},
+          {icon:'📸', text:'Document process with before/after photos for SmartLoop portfolio'},
+        ],
+        smartloop:'Log "Repair instead of replace" and "Share/donate item" — upload upcycle photos to earn badges',
+        assessment:'Completed upcycled product + process reflection sheet',
+      },
+      {
+        title:'Lesson 2: The Circular Economy',
+        duration:'50 min',
+        objective:'Understand linear vs circular economic models and how reuse keeps materials in the loop.',
+        activities:[
+          {icon:'♻️', text:'Diagram activity — draw the lifecycle of a t-shirt in linear vs circular models'},
+          {icon:'🎭', text:'Role play — students become "materials" flowing through a circular economy'},
+          {icon:'🤝', text:'School swap shop planning — organise a class swap event for unwanted items'},
+        ],
+        smartloop:'Explore the Recycling Game to practice sorting — class competition for highest accuracy scores',
+        assessment:'Labelled diagram: circular economy of one everyday product',
+      },
+    ],
+    checklist:['Upcycling materials collected','Repair stations set up','Circular economy diagrams complete','Swap shop date set'],
+  },
+  {
+    n:4, title:'Recycle Right', theme:'How recycling works, contamination problems, and sorting accuracy',
+    status:'active', phase:'Engage',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'Technologies', bg:'#F3E5F5', color:'#6A1B9A'},
+      {label:'Mathematics', bg:'#E8F5E9', color:'#2E7D32'},
+    ],
+    acara:['ACSSU074 – Properties of materials','ACTDIP009 – Data collection with digital tools','ACMNA080 – Fractions & percentages'],
+    lessons:[
+      {
+        title:'Lesson 1: Recycling Science',
+        duration:'60 min',
+        objective:'Investigate how materials are recycled — glass, paper, plastic, metal — and the science behind each process.',
+        activities:[
+          {icon:'🔬', text:'Material properties lab — test 8 materials for recyclability (magnetic, density, flexibility tests)'},
+          {icon:'📱', text:'Use SmartLoop bin sensors — analyse real-time fill-level data from school bins'},
+          {icon:'📊', text:'Calculate school recycling rate: (recyclables ÷ total waste) × 100'},
+        ],
+        smartloop:'Students review Live Bin Status and compare contamination rates across school zones',
+        assessment:'Lab report: material properties table + recycling process flow chart',
+      },
+      {
+        title:'Lesson 2: Contamination Detectives',
+        duration:'55 min',
+        objective:'Identify recycling contamination and its impact. Develop strategies to reduce bin contamination at school.',
+        activities:[
+          {icon:'🕵️', text:'Bin audit — inspect school recycling bins for contamination, photograph and categorise errors'},
+          {icon:'📐', text:'Calculate contamination percentage — display as pie charts'},
+          {icon:'📋', text:'Design anti-contamination signage for school bins using correct recycling symbols'},
+        ],
+        smartloop:'Play Recycling Game (Medium difficulty) — class aim for 85%+ average accuracy',
+        assessment:'Contamination audit report + original bin signage designs',
+      },
+    ],
+    checklist:['Material property tests complete','Bin sensor data analysed','Contamination audit done','Signage designs submitted'],
+  },
+  {
+    n:5, title:'Composting & Food Waste', theme:'Organic waste cycles, composting science, and school food waste reduction',
+    status:'upcoming', phase:'Empower',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'HASS', bg:'#FFF3E0', color:'#E65100'},
+      {label:'Mathematics', bg:'#E8F5E9', color:'#2E7D32'},
+    ],
+    acara:['ACSSU043 – Living things & habitats','ACHASSK090 – Environmental sustainability','ACMNA291 – Data interpretation'],
+    lessons:[
+      {
+        title:'Lesson 1: The Science of Composting',
+        duration:'60 min',
+        objective:'Investigate decomposition, soil microorganisms, and the composting process through hands-on experiments.',
+        activities:[
+          {icon:'🥬', text:'Set up 3 compost experiments — hot compost, worm farm, bokashi bucket — compare over 4 weeks'},
+          {icon:'🔬', text:'Microscope work — observe soil microorganisms in compost vs regular soil'},
+          {icon:'🌡️', text:'Daily temperature logging of compost bins — graph the heat cycle'},
+        ],
+        smartloop:'Log "Compost food scraps" daily — track whole-class composting streak on SmartLoop',
+        assessment:'Compost experiment hypothesis + observation log setup',
+      },
+      {
+        title:'Lesson 2: Food Waste Audit',
+        duration:'55 min',
+        objective:'Measure and analyse school food waste patterns. Propose evidence-based solutions.',
+        activities:[
+          {icon:'⚖️', text:'Weigh food waste from canteen bins over 3 days — sort into avoidable/unavoidable'},
+          {icon:'📊', text:'Calculate weekly food waste per student — compare with national averages'},
+          {icon:'💡', text:'Design a "Love Food, Hate Waste" campaign for school — posters, announcements, strategies'},
+        ],
+        smartloop:'Monitor FOGO bin fill-levels on SmartLoop — set class target to reduce food waste by 20%',
+        assessment:'Food waste data report with comparison chart + campaign proposal',
+      },
+    ],
+    checklist:['Compost experiments started','Microscope observations done','Food waste weighed 3 days','Campaign designs created'],
+  },
+  {
+    n:6, title:'Energy & Water', theme:'Resource conservation, carbon footprints, and sustainable school operations',
+    status:'upcoming', phase:'Empower',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'Mathematics', bg:'#E8F5E9', color:'#2E7D32'},
+      {label:'Technologies', bg:'#F3E5F5', color:'#6A1B9A'},
+    ],
+    acara:['ACSSU049 – Energy sources & transfers','ACMNA083 – Use of money & financial maths','ACTDIK015 – Data & digital systems'],
+    lessons:[
+      {
+        title:'Lesson 1: Carbon Footprint Investigators',
+        duration:'60 min',
+        objective:'Calculate classroom/school carbon footprint from energy use, transport, and waste.',
+        activities:[
+          {icon:'💡', text:'Energy audit — measure electricity usage of classroom devices with plug-in meters'},
+          {icon:'🚗', text:'Transport survey — calculate class travel emissions (how students get to school)'},
+          {icon:'📊', text:'Build a carbon footprint pie chart — identify biggest emission sources'},
+        ],
+        smartloop:'Track CO₂ savings on SmartLoop dashboard — connect personal actions to carbon data',
+        assessment:'Carbon footprint infographic with 3 reduction strategies',
+      },
+      {
+        title:'Lesson 2: Water Wise',
+        duration:'50 min',
+        objective:'Investigate water usage, rainwater harvesting, and water conservation strategies.',
+        activities:[
+          {icon:'💧', text:'Water meter reading challenge — measure taps, toilets, and drinking fountains'},
+          {icon:'🏗️', text:'Design a rainwater collection system for the school garden (scale drawing)'},
+          {icon:'🎯', text:'Launch "Water Wise Week" — daily water-saving pledges logged in SmartLoop'},
+        ],
+        smartloop:'Explore SmartLoop water savings data — how individual actions add up to bathtubs saved',
+        assessment:'Scale drawing of rainwater system + water-saving pledge poster',
+      },
+    ],
+    checklist:['Energy audit meters borrowed','Transport survey completed','Carbon charts displayed','Water readings taken'],
+  },
+  {
+    n:7, title:'Community Action', theme:'Spreading sustainability beyond school — families, community, and advocacy',
+    status:'upcoming', phase:'Execute',
+    strands:[
+      {label:'English', bg:'#FFFDE7', color:'#F57F17'},
+      {label:'HASS', bg:'#FFF3E0', color:'#E65100'},
+      {label:'The Arts', bg:'#FCE4EC', color:'#C62828'},
+    ],
+    acara:['ACELY1694 – Persuasive texts','ACHASSK091 – Community participation','ACAVAM115 – Art in public spaces'],
+    lessons:[
+      {
+        title:'Lesson 1: Eco-Ambassadors',
+        duration:'60 min',
+        objective:'Develop communication skills to spread sustainability messages to families and the wider community.',
+        activities:[
+          {icon:'✏️', text:'Write a persuasive letter to the school principal proposing one sustainability change'},
+          {icon:'🎙️', text:'Prepare a 2-minute "eco-elevator pitch" — present sustainability tip to another class'},
+          {icon:'📱', text:'Create a family eco-challenge card — 10 actions families can do at home'},
+        ],
+        smartloop:'Use Global Challenge page — compare City Beach PS progress with partner schools worldwide',
+        assessment:'Persuasive letter + peer-reviewed eco-pitch performance',
+      },
+      {
+        title:'Lesson 2: Public Art for Planet',
+        duration:'70 min (double period)',
+        objective:'Create public sustainability art installations using recycled materials for school display.',
+        activities:[
+          {icon:'🎨', text:'Collaborative mural — class creates a large-scale sustainability mural from bottle caps, fabric scraps, cardboard'},
+          {icon:'📸', text:'Photo essay — document the creation process for SmartLoop School Exchange wall'},
+          {icon:'🤝', text:'Share creation with partner schools via SmartLoop Exchange — invite peer feedback'},
+        ],
+        smartloop:'Post photos to School Exchange Wall — earn Global Badges for cross-country sharing',
+        assessment:'Art installation + artist statement explaining sustainability message',
+      },
+    ],
+    checklist:['Principal letters submitted','Eco-pitches presented','Family challenge cards sent home','Mural materials gathered'],
+  },
+  {
+    n:8, title:'Sustainability Showcase', theme:'Celebrating achievements, presenting data, and planning for ongoing impact',
+    status:'upcoming', phase:'Execute',
+    strands:[
+      {label:'Science', bg:'#E3F2FD', color:'#1565C0'},
+      {label:'English', bg:'#FFFDE7', color:'#F57F17'},
+      {label:'Mathematics', bg:'#E8F5E9', color:'#2E7D32'},
+      {label:'The Arts', bg:'#FCE4EC', color:'#C62828'},
+    ],
+    acara:['ACSHE062 – Communicating science ideas','ACELY1700 – Oral presentations','ACMNA084 – Data displays','ACAVAM116 – Exhibition & display'],
+    lessons:[
+      {
+        title:'Lesson 1: Data Showcase Preparation',
+        duration:'60 min',
+        objective:'Compile 8 weeks of data into visual presentations — before/after impact evidence.',
+        activities:[
+          {icon:'📊', text:'Create before/after data displays — waste reduction, recycling rates, CO₂ savings, compost yields'},
+          {icon:'🏆', text:'SmartLoop achievement summary — print individual EcoHero progress cards'},
+          {icon:'📝', text:'Write reflective piece: "My sustainability journey — what I learned and what I\'ll keep doing"'},
+        ],
+        smartloop:'Screenshot SmartLoop dashboards — use data as evidence in presentations',
+        assessment:'Data poster with minimum 4 before/after comparisons',
+      },
+      {
+        title:'Lesson 2: The Big Showcase',
+        duration:'90 min (assembly/event)',
+        objective:'Present sustainability findings and achievements to school community — parents, teachers, and partner schools.',
+        activities:[
+          {icon:'🎤', text:'Student presentations — each group presents one topic area to audience'},
+          {icon:'🏅', text:'EcoHero Awards ceremony — top SmartLoop achievers, best projects, most improved'},
+          {icon:'🌏', text:'Live video link with one partner school — share highlights and celebrate together'},
+          {icon:'📋', text:'Sustainability pledge wall — every attendee signs a personal eco-commitment'},
+        ],
+        smartloop:'Celebrate Global Challenge standings — announce City Beach PS final leaderboard position',
+        assessment:'Presentation rubric (content, data use, communication, teamwork) + personal reflection',
+      },
+    ],
+    checklist:['Data displays finalised','EcoHero cards printed','Showcase event organised','Decomposition experiment results recorded'],
+  },
+];
+
+const teacherResources = [
+  {emoji:'📋', name:'Curriculum Overview (PDF)', desc:'Full 8-week scope & sequence with ACARA codes', bg:'var(--turq-wash)', color:'var(--aqua-deep)'},
+  {emoji:'📊', name:'Assessment Rubrics', desc:'Rubrics for each week — formative & summative', bg:'var(--leaf-pale)', color:'var(--leaf)'},
+  {emoji:'📝', name:'Student Worksheets Pack', desc:'Printable worksheets for all 16 lessons', bg:'var(--sunny-pale)', color:'#B8860B'},
+  {emoji:'👨‍👩‍👧', name:'Parent Information Letter', desc:'Take-home letter explaining the program', bg:'var(--sky-pale)', color:'var(--sky)'},
+  {emoji:'🏆', name:'EcoHero Certificate Template', desc:'Editable certificate for Week 8 awards', bg:'var(--plum-pale)', color:'var(--plum)'},
+  {emoji:'📱', name:'SmartLoop Teacher Guide', desc:'How to use SmartLoop dashboard data in lessons', bg:'var(--coral-pale)', color:'var(--coral)'},
+  {emoji:'🌏', name:'Global Partner Setup Guide', desc:'Connecting with international partner schools', bg:'#E3F2FD', color:'#1565C0'},
+  {emoji:'🗑️', name:'Bin Audit Templates', desc:'Data collection sheets for waste & contamination audits', bg:'var(--earth-pale)', color:'var(--earth)'},
+];
+
+// Curriculum teacher checklist state
+if (!state.currChecklist) state.currChecklist = {};
+
+function renderCurriculum() {
+  document.getElementById('curriculum-weeks').innerHTML = curriculumWeeks.map((w, wi) => {
+    const statusClass = w.status === 'done' ? 'week-done' : w.status === 'active' ? 'week-active' : '';
+    const numClass = w.status === 'done' ? 'done' : w.status === 'active' ? 'active' : 'upcoming';
+    const phaseColors = {Explore:'var(--turq-wash);color:var(--aqua-deep)', Engage:'var(--sunny-pale);color:#B8860B', Empower:'var(--plum-pale);color:#6A1B9A', Execute:'var(--leaf-pale);color:var(--leaf)'};
+    return `
+    <div class="curr-week ${statusClass} ${wi === 3 ? 'open' : ''}" id="cw-${wi}">
+      <div class="curr-week-head" onclick="toggleWeek(${wi})">
+        <div class="curr-week-num ${numClass}">${w.n}</div>
+        <div class="curr-week-info">
+          <div class="curr-week-title">
+            Week ${w.n}: ${w.title}
+            <span style="font-size:9px; padding:2px 8px; border-radius:8px; background:${phaseColors[w.phase]}; margin-left:6px">${w.phase}</span>
+            ${w.status==='done'?'<span style="font-size:9px; padding:2px 8px; border-radius:8px; background:var(--leaf-pale); color:var(--leaf); margin-left:4px">✓ Complete</span>':''}
+            ${w.status==='active'?'<span style="font-size:9px; padding:2px 8px; border-radius:8px; background:var(--sunny-pale); color:#B8860B; margin-left:4px">● Current</span>':''}
+          </div>
+          <div class="curr-week-theme">${w.theme}</div>
+          <div class="curr-week-strands">
+            ${w.strands.map(s => `<span class="curr-strand" style="background:${s.bg}; color:${s.color}">${s.label}</span>`).join('')}
+          </div>
+        </div>
+        <div class="curr-week-arrow">▼</div>
+      </div>
+      <div class="curr-week-body">
+        <!-- ACARA Codes -->
+        <div style="margin-top:12px; padding:10px 12px; background:var(--turq-wash); border-radius:10px; border:2px dashed var(--turq-pale)">
+          <div style="font-size:10px; font-weight:800; color:var(--aqua-deep); margin-bottom:4px">📚 ACARA Alignment</div>
+          ${w.acara.map(a => `<div style="font-size:10px; color:var(--text-light); font-weight:600; padding:1px 0">• ${a}</div>`).join('')}
+        </div>
+
+        <!-- Lessons -->
+        ${w.lessons.map((l, li) => `
+        <div class="lesson-block">
+          <div class="lesson-title">
+            ${l.title}
+            <span style="font-size:9px; padding:2px 8px; border-radius:8px; background:var(--craft); color:var(--text-light); margin-left:auto">⏱️ ${l.duration}</span>
+          </div>
+          <div class="lesson-obj">${l.objective}</div>
+          <div class="lesson-activities">
+            ${l.activities.map(a => `
+            <div class="lesson-act">
+              <div class="lesson-act-icon">${a.icon}</div>
+              <div>${a.text}</div>
+            </div>`).join('')}
+          </div>
+          <div class="lesson-smartloop">💧 SmartLoop Integration: ${l.smartloop}</div>
+          <div class="lesson-assessment">📝 Assessment: ${l.assessment}</div>
+        </div>`).join('')}
+
+        <!-- Teacher Checklist -->
+        <div style="margin-top:14px; padding:12px; background:var(--cream); border-radius:12px; border:2px dashed var(--turq-pale)">
+          <div style="font-size:12px; font-weight:800; color:var(--aqua-deep); margin-bottom:8px">✅ Teacher Checklist</div>
+          ${w.checklist.map((c, ci) => {
+            const key = wi + '-' + ci;
+            const done = state.currChecklist[key] || w.status === 'done';
+            return `
+            <div class="curr-check" onclick="toggleCurrCheck('${key}', ${wi}, event)">
+              <span class="curr-check-box ${done?'checked':''}">${done?'✓':'○'}</span>
+              <span style="${done?'text-decoration:line-through; opacity:0.6':''}">${c}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Resources
+  document.getElementById('teacher-resources').innerHTML = teacherResources.map(r => `
+    <div class="resource-item">
+      <div class="resource-icon" style="background:${r.bg}">${r.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:12px; font-weight:700; color:var(--aqua-deep)">${r.name}</div>
+        <div style="font-size:10px; color:var(--text-light)">${r.desc}</div>
+      </div>
+      <div class="sticker" style="background:var(--turq-wash); color:var(--aqua-deep); transform:none; font-size:9px; cursor:pointer">📥 Download</div>
+    </div>
+  `).join('');
+
+  updateCurrProgress();
+}
+
+function toggleWeek(idx) {
+  const el = document.getElementById('cw-' + idx);
+  el.classList.toggle('open');
+}
+
+function toggleCurrCheck(key, weekIdx, evt) {
+  if (curriculumWeeks[weekIdx].status === 'done') return;
+  state.currChecklist[key] = !state.currChecklist[key];
+  if (state.currChecklist[key]) {
+    state.riplets += 10;
+    state.xp += 8;
+    spawnConfetti(evt.clientX, evt.clientY);
+    showToast('✅', 'Curriculum task done! +10 💧', 'reward');
+    updateStats();
+  }
+  renderCurriculum();
+}
+
+function updateCurrProgress() {
+  const totalChecks = curriculumWeeks.reduce((sum, w) => sum + w.checklist.length, 0);
+  let doneChecks = 0;
+  curriculumWeeks.forEach((w, wi) => {
+    w.checklist.forEach((c, ci) => {
+      if (w.status === 'done' || state.currChecklist[wi + '-' + ci]) doneChecks++;
+    });
+  });
+  const pct = Math.round((doneChecks / totalChecks) * 100);
+  const weeksComplete = curriculumWeeks.filter(w => w.status === 'done').length;
+  document.getElementById('curr-progress-pct').textContent = pct + '%';
+  document.getElementById('curr-progress-bar').style.width = pct + '%';
+  document.getElementById('curr-progress-text').textContent = `${weeksComplete} of 8 weeks complete`;
+}
+
+function renderAllGlobal() {
+  renderCountryLeaderboard();
+  renderCountryChallenges();
+  renderCollabBars();
+  renderGlobalSchoolLB();
+  renderPartnerMap();
+  renderSchoolMatchups();
+  renderExchangeWall();
+  renderEcoQuests();
+  renderGlobalBadges();
+}
+
+/* ═══════ RECYCLING GAME ═══════ */
+const wasteItems = [
+  // Landfill
+  {emoji:'🧽', name:'Used Sponge', bin:'landfill', hint:'Too dirty to recycle'},
+  {emoji:'🩹', name:'Band-Aid', bin:'landfill', hint:'Medical waste → landfill'},
+  {emoji:'🧷', name:'Broken Toy', bin:'landfill', hint:'Mixed materials, can\'t recycle'},
+  {emoji:'🎈', name:'Popped Balloon', bin:'landfill', hint:'Rubber doesn\'t recycle'},
+  {emoji:'🖊️', name:'Dried-Out Pen', bin:'landfill', hint:'Mixed plastic & ink'},
+  {emoji:'🧹', name:'Old Toothbrush', bin:'landfill', hint:'Too small for recycling'},
+  {emoji:'👟', name:'Worn Shoe', bin:'landfill', hint:'Mixed materials → landfill'},
+  {emoji:'🎭', name:'Styrofoam Cup', bin:'landfill', hint:'Can\'t be recycled curbside'},
+  // Recycling
+  {emoji:'🥫', name:'Tin Can', bin:'recycling', hint:'Metal cans are recyclable!'},
+  {emoji:'🍶', name:'Glass Bottle', bin:'recycling', hint:'Glass recycles endlessly'},
+  {emoji:'🧴', name:'Plastic Bottle', bin:'recycling', hint:'Rinse first, then recycle'},
+  {emoji:'🥤', name:'Aluminium Can', bin:'recycling', hint:'Aluminium is infinitely recyclable'},
+  {emoji:'🫙', name:'Glass Jar', bin:'recycling', hint:'Remove lid, rinse, recycle'},
+  {emoji:'🧃', name:'Juice Box', bin:'recycling', hint:'Cartons are recyclable!'},
+  {emoji:'🍯', name:'Plastic Container', bin:'recycling', hint:'Check for recycling symbol'},
+  // Compost
+  {emoji:'🍌', name:'Banana Peel', bin:'compost', hint:'Fruit scraps love compost'},
+  {emoji:'🍎', name:'Apple Core', bin:'compost', hint:'Nature\'s perfect compost'},
+  {emoji:'🥚', name:'Egg Shells', bin:'compost', hint:'Great for garden soil'},
+  {emoji:'🥕', name:'Carrot Top', bin:'compost', hint:'Veggie scraps → compost'},
+  {emoji:'🍞', name:'Stale Bread', bin:'compost', hint:'Food waste = compost'},
+  {emoji:'☕', name:'Coffee Grounds', bin:'compost', hint:'Gardens love coffee too!'},
+  {emoji:'🫖', name:'Tea Bags', bin:'compost', hint:'Compostable & nutritious'},
+  {emoji:'🌽', name:'Corn Husk', bin:'compost', hint:'Plant-based → compost bin'},
+  // Paper
+  {emoji:'📰', name:'Newspaper', bin:'paper', hint:'Clean paper is recyclable'},
+  {emoji:'📦', name:'Cardboard Box', bin:'paper', hint:'Flatten & recycle'},
+  {emoji:'📝', name:'School Notes', bin:'paper', hint:'Paper bin for clean paper'},
+  {emoji:'📩', name:'Junk Mail', bin:'paper', hint:'Envelopes can be recycled'},
+  {emoji:'📚', name:'Old Notebook', bin:'paper', hint:'Remove spiral, recycle pages'},
+  {emoji:'🎁', name:'Wrapping Paper', bin:'paper', hint:'Plain wrapping = paper bin'},
+  {emoji:'📋', name:'Cereal Box', bin:'paper', hint:'Cardboard → paper recycling'},
+  {emoji:'🗞️', name:'Magazine', bin:'paper', hint:'Glossy paper still recycles'},
+];
+
+let game = {
+  active: false,
+  difficulty: 'easy',
+  timeLimit: 6,
+  lives: 3,
+  score: 0,
+  riplets: 0,
+  correct: 0,
+  wrong: 0,
+  sorted: 0,
+  streak: 0,
+  bestStreak: 0,
+  multiplier: 1,
+  currentItem: null,
+  queue: [],
+  timer: null,
+  timeLeft: 6,
+  timerInterval: null,
+  highScores: { easy:0, medium:0, hard:0 },
+};
+
+function showGameIntro() {
+  document.getElementById('game-intro').style.display = '';
+  document.getElementById('game-active').style.display = 'none';
+  document.getElementById('game-over').style.display = 'none';
+  const hs = Object.entries(game.highScores).filter(([,v])=>v>0).map(([k,v])=>`${k}: ${v}💧`).join(' · ');
+  document.getElementById('game-high-score').textContent = hs ? `🏆 Best: ${hs}` : '';
+}
+
+function startGame(diff) {
+  game.difficulty = diff;
+  game.timeLimit = diff === 'easy' ? 6 : diff === 'medium' ? 4 : 2.5;
+  game.lives = 3;
+  game.score = 0;
+  game.riplets = 0;
+  game.correct = 0;
+  game.wrong = 0;
+  game.sorted = 0;
+  game.streak = 0;
+  game.bestStreak = 0;
+  game.multiplier = 1;
+  game.active = true;
+
+  // Shuffle and pick 20 items
+  game.queue = [...wasteItems].sort(() => Math.random()-0.5).slice(0, 20);
+  game.currentItem = null;
+
+  document.getElementById('game-intro').style.display = 'none';
+  document.getElementById('game-over').style.display = 'none';
+  document.getElementById('game-active').style.display = '';
+
+  document.getElementById('game-total').textContent = game.queue.length;
+  updateGameHUD();
+  nextItem();
+}
+
+function restartGame() {
+  startGame(game.difficulty);
+}
+
+function updateGameHUD() {
+  document.getElementById('game-riplets').textContent = game.riplets;
+  document.getElementById('game-sorted').textContent = game.sorted;
+  document.getElementById('game-lives').textContent = game.lives;
+  document.getElementById('game-mult').textContent = game.multiplier;
+  // Streak dots
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById('gs' + i);
+    if (game.streak > i) {
+      dot.textContent = '●';
+      dot.classList.add('lit');
+    } else {
+      dot.textContent = '○';
+      dot.classList.remove('lit');
+    }
+  }
+}
+
+function nextItem() {
+  if (!game.active) return;
+  if (game.queue.length === 0 || game.lives <= 0) {
+    endGame();
+    return;
+  }
+  game.currentItem = game.queue.pop();
+  game.sorted++;
+
+  const emojiEl = document.getElementById('game-item-emoji');
+  const nameEl = document.getElementById('game-item-name');
+  const hintEl = document.getElementById('game-item-hint');
+
+  emojiEl.className = 'game-item-enter';
+  emojiEl.textContent = game.currentItem.emoji;
+  nameEl.textContent = game.currentItem.name;
+  hintEl.textContent = game.currentItem.hint;
+
+  // Reset bins
+  document.querySelectorAll('.game-bin').forEach(b => {
+    b.classList.remove('correct-flash','wrong-flash');
+  });
+
+  updateGameHUD();
+  startItemTimer();
+}
+
+function startItemTimer() {
+  game.timeLeft = game.timeLimit;
+  const fill = document.getElementById('game-timer-fill');
+  const timerText = document.getElementById('game-timer');
+  fill.style.width = '100%';
+  fill.classList.remove('danger');
+  timerText.textContent = game.timeLeft.toFixed(1);
+
+  clearInterval(game.timerInterval);
+  game.timerInterval = setInterval(() => {
+    game.timeLeft -= 0.1;
+    if (game.timeLeft < 0) game.timeLeft = 0;
+    const pct = (game.timeLeft / game.timeLimit) * 100;
+    fill.style.width = pct + '%';
+    timerText.textContent = game.timeLeft.toFixed(1);
+    if (pct < 30) fill.classList.add('danger');
+    if (game.timeLeft <= 0) {
+      clearInterval(game.timerInterval);
+      handleTimeout();
+    }
+  }, 100);
+}
+
+function handleTimeout() {
+  if (!game.active) return;
+  game.lives--;
+  game.streak = 0;
+  game.multiplier = 1;
+  showGameFeedback('⏰ Too slow!', 'var(--coral)');
+  updateGameHUD();
+  // Brief pause then next
+  setTimeout(() => nextItem(), 800);
+}
+
+function sortItem(bin) {
+  if (!game.active || !game.currentItem) return;
+  clearInterval(game.timerInterval);
+
+  const correct = game.currentItem.bin === bin;
+  const binEl = document.querySelector(`.game-bin[data-bin="${bin}"]`);
+
+  if (correct) {
+    game.correct++;
+    game.streak++;
+    if (game.streak > game.bestStreak) game.bestStreak = game.streak;
+    // Multiplier at 3-streak
+    if (game.streak >= 3 && game.streak % 3 === 0) {
+      game.multiplier = Math.min(game.multiplier + 1, 5);
+      showToast('🔥', `Streak x${game.multiplier} multiplier!`, 'badge');
+    }
+    const earned = 5 * game.multiplier;
+    game.riplets += earned;
+    game.score += earned;
+
+    binEl.classList.add('correct-flash');
+    showGameFeedback(game.multiplier > 1 ? `✅ +${earned}💧 (x${game.multiplier})` : `✅ +${earned}💧`, 'var(--leaf)');
+  } else {
+    game.wrong++;
+    game.lives--;
+    game.streak = 0;
+    game.multiplier = 1;
+    binEl.classList.add('wrong-flash');
+    showGameFeedback(`❌ It was ${game.currentItem.bin}!`, 'var(--coral)');
+  }
+
+  updateGameHUD();
+
+  if (game.lives <= 0) {
+    setTimeout(() => endGame(), 600);
+  } else {
+    setTimeout(() => nextItem(), 700);
+  }
+}
+
+function showGameFeedback(text, color) {
+  const fb = document.getElementById('game-feedback');
+  fb.textContent = text;
+  fb.style.color = color;
+  fb.className = 'game-feedback show';
+  setTimeout(() => fb.className = 'game-feedback', 900);
+}
+
+function endGame() {
+  game.active = false;
+  clearInterval(game.timerInterval);
+
+  // Award Riplets to global state
+  state.riplets += game.riplets;
+  state.xp += Math.round(game.riplets * 0.8);
+  updateStats();
+
+  if (game.riplets > 0) {
+    spawnConfetti(window.innerWidth/2, window.innerHeight/2);
+    showToast('🎮', `Game Over! +${game.riplets} Riplets earned!`, 'riplet');
+    setTimeout(() => showToast('⚡', `+${Math.round(game.riplets*0.8)} XP gained!`, 'xp'), 500);
+  }
+
+  // High score
+  if (game.riplets > game.highScores[game.difficulty]) {
+    game.highScores[game.difficulty] = game.riplets;
+  }
+
+  const total = game.correct + game.wrong;
+  const accuracy = total > 0 ? Math.round((game.correct/total)*100) : 0;
+  const emoji = accuracy >= 90 ? '🏆' : accuracy >= 70 ? '⭐' : accuracy >= 50 ? '👍' : '💪';
+  const title = accuracy >= 90 ? 'Sorting Superstar!' : accuracy >= 70 ? 'Great Sorting!' : accuracy >= 50 ? 'Good Effort!' : 'Keep Practising!';
+  const msg = accuracy >= 90
+    ? 'Amazing! You really know your bins!'
+    : accuracy >= 70
+    ? 'Solid work — a few tricky ones got you.'
+    : accuracy >= 50
+    ? 'Not bad! Play again to improve your accuracy.'
+    : 'Every game teaches you more about recycling!';
+
+  document.getElementById('game-over-emoji').textContent = emoji;
+  document.getElementById('game-over-title').textContent = title;
+  document.getElementById('game-over-riplets').textContent = game.riplets;
+  document.getElementById('game-over-correct').textContent = game.correct;
+  document.getElementById('game-over-best-streak').textContent = game.bestStreak;
+  document.getElementById('game-over-accuracy').textContent = accuracy + '%';
+  document.getElementById('game-over-msg').textContent = msg;
+
+  document.getElementById('game-active').style.display = 'none';
+  document.getElementById('game-over').style.display = '';
+}
+
+/* ═══════ SVG CHARTS ═══════ */
+function makeAreaChart(id, data, key, color, w, h) {
+  const pad = {t:10,r:10,b:28,l:36};
+  const cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
+  const max = Math.ceil(Math.max(...data.map(d=>d[key]))/10)*10 || 100;
+  let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">`;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch-(ch*i/4);
+    svg+=`<line x1="${pad.l}" y1="${y}" x2="${w-pad.r}" y2="${y}" class="ch-grid"/>`;
+    svg+=`<text x="${pad.l-4}" y="${y+3}" text-anchor="end" class="ch-label">${Math.round(max*i/4)}</text>`;
+  }
+  data.forEach((d,i)=>{
+    const x=pad.l+(cw/(data.length-1))*i;
+    svg+=`<text x="${x}" y="${h-4}" text-anchor="middle" class="ch-label">${d.label||''}</text>`;
+  });
+  const pts=data.map((d,i)=>({x:pad.l+(cw/(data.length-1))*i, y:pad.t+ch-(ch*(d[key]/max))}));
+  const line=pts.map((p,i)=>`${i===0?'M':'L'}${p.x},${p.y}`).join(' ');
+  svg+=`<path d="${line} L${pts[pts.length-1].x},${pad.t+ch} L${pts[0].x},${pad.t+ch} Z" fill="${color}" class="ch-area"/>`;
+  svg+=`<path d="${line}" stroke="${color}" class="ch-line"/>`;
+  pts.forEach(p=>svg+=`<circle cx="${p.x}" cy="${p.y}" r="4" fill="${color}" stroke="white" stroke-width="2"/>`);
+  svg+='</svg>';
+  document.getElementById(id).innerHTML=svg;
+}
+
+function makeBarChart(id, data, k1, k2, c1, c2, w, h) {
+  const pad={t:10,r:10,b:28,l:36};
+  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+  const max=Math.ceil(Math.max(...data.flatMap(d=>[d[k1],d[k2]]))/10)*10||100;
+  const barW=(cw/data.length)*0.3, gap=3;
+  let svg=`<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}">`;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch-(ch*i/4);
+    svg+=`<line x1="${pad.l}" y1="${y}" x2="${w-pad.r}" y2="${y}" class="ch-grid"/>`;
+    svg+=`<text x="${pad.l-4}" y="${y+3}" text-anchor="end" class="ch-label">${Math.round(max*i/4)}</text>`;
+  }
+  data.forEach((d,i)=>{
+    const cx=pad.l+(cw/data.length)*(i+0.5);
+    const h1=ch*(d[k1]/max), h2=ch*(d[k2]/max);
+    svg+=`<rect x="${cx-barW-gap/2}" y="${pad.t+ch-h1}" width="${barW}" height="${h1}" fill="${c1}" class="ch-bar"/>`;
+    svg+=`<rect x="${cx+gap/2}" y="${pad.t+ch-h2}" width="${barW}" height="${h2}" fill="${c2}" class="ch-bar"/>`;
+    svg+=`<text x="${cx}" y="${h-4}" text-anchor="middle" class="ch-label">${d.label||''}</text>`;
+  });
+  svg+='</svg>';
+  document.getElementById(id).innerHTML=svg;
+}
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+function init() {
+  renderProfiles();
+  document.getElementById('page-sub').textContent = `Welcome back, ${activeProfile.name}! Your planet thanks you.`;
+  renderActivityCards();
+  renderTodayLog();
+  renderRecentActivity();
+  renderBadges();
+  renderRewards();
+  renderBins();
+  renderLeaderboard();
+  renderTimeline();
+  renderClubs();
+  renderChecklist();
+  renderCurriculum();
+  renderAllGlobal();
+
+  makeAreaChart('weekly-chart',
+    [{label:'Mon',xp:420},{label:'Tue',xp:380},{label:'Wed',xp:520},
+     {label:'Thu',xp:310},{label:'Fri',xp:580},{label:'Sat',xp:190},{label:'Sun',xp:280}],
+    'xp', '#17B5B5', 480, 160);
+
+  makeBarChart('bin-trend-chart',
+    [{label:'06:00',landfill:20,recycling:15},{label:'08:00',landfill:35,recycling:28},
+     {label:'10:00',landfill:48,recycling:40},{label:'12:00',landfill:72,recycling:55},
+     {label:'14:00',landfill:60,recycling:42},{label:'16:00',landfill:82,recycling:48}],
+    'landfill', 'recycling', '#6B6B6B', '#5B7FA5', 520, 200);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
