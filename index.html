@@ -807,24 +807,25 @@ body {
   </a>
 </div>
 
-<!-- This script pushes the existing fixed navbar down so it doesn't get hidden -->
+<!-- This script pushes ALL existing fixed/sticky elements down so they don't get hidden -->
 <script>
   (function() {
     var barHeight = 44;
     // Push body content down
     document.body.style.paddingTop = (parseInt(window.getComputedStyle(document.body).paddingTop) || 0) + barHeight + 'px';
-    // Find and push down any existing fixed/sticky nav elements
+    // Find and push down ALL fixed/sticky elements on the page
     setTimeout(function() {
-      var navs = document.querySelectorAll('nav, header, [class*="nav"], [class*="header"], [class*="toolbar"]');
-      navs.forEach(function(el) {
+      document.querySelectorAll('*').forEach(function(el) {
         if (el.id === 'thinkos-back-bar') return;
         var style = window.getComputedStyle(el);
         if (style.position === 'fixed' || style.position === 'sticky') {
           var currentTop = parseInt(style.top) || 0;
-          el.style.top = (currentTop + barHeight) + 'px';
+          if (currentTop < barHeight) {
+            el.style.top = (currentTop + barHeight) + 'px';
+          }
         }
       });
-    }, 100);
+    }, 300);
   })();
 </script>
 <style>
